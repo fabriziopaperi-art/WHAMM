@@ -146,9 +146,9 @@
   <header>
     <h1><span class="dot"></span>Hyperliquid Tracker</h1>
     <div class="controls">
-      <label class="toggle"><input type="checkbox" id="autoRefresh" onchange="toggleAuto()"> Auto 60s</label>
+      <label class="toggle"><input type="checkbox" id="autoRefresh"> Auto 60s</label>
       <span id="lastUpdate"></span>
-      <button class="primary" id="btnRefresh" onclick="refreshAll()">Aggiorna</button>
+      <button class="primary" id="btnRefresh">Aggiorna</button>
       <div class="user-chip">
         <img id="userAvatar" alt="">
         <span id="userEmail"></span>
@@ -171,7 +171,7 @@
   <div class="add-account">
     <input type="text" id="newName" placeholder="Nome (es. MARIO)" maxlength="30">
     <input type="text" id="newAddress" placeholder="0x..." spellcheck="false">
-    <button class="primary" onclick="addAccount()">+ Aggiungi conto</button>
+    <button class="primary" id="addAccountBtn">+ Aggiungi conto</button>
   </div>
 </div>
 
@@ -596,11 +596,17 @@ document.getElementById('accountsGrid').addEventListener('click', e => {
   if (btn) removeAccount(btn.getAttribute('data-remove'));
 });
 
-// Collega i pulsanti alle funzioni (necessario perché siamo in un ES module)
-document.getElementById('btnRefresh').addEventListener('click', refreshAll);
-document.getElementById('addAccountBtn').addEventListener('click', addAccount);
-document.getElementById('autoRefresh').addEventListener('change', toggleAuto);
+/* ============ LISTENER PULSANTI (safe) ============ */
+const _btnRefresh = document.getElementById('btnRefresh');
+if (_btnRefresh) _btnRefresh.addEventListener('click', refreshAll);
 
+const _btnAdd = document.getElementById('addAccountBtn');
+if (_btnAdd) _btnAdd.addEventListener('click', addAccount);
+
+const _chkAuto = document.getElementById('autoRefresh');
+if (_chkAuto) _chkAuto.addEventListener('change', toggleAuto);
+
+/* ============ AVVIO ============ */
 initAuth();
 </script>
 </body>
