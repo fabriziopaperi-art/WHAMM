@@ -18,7 +18,6 @@
   .container{max-width:1400px; margin:0 auto;}
   a{color:var(--blue);}
 
-  /* LOGIN */
   .login-wrap{min-height:90vh; display:flex; align-items:center; justify-content:center;}
   .login-card{
     background:var(--card); border:1px solid var(--border); border-radius:14px;
@@ -35,7 +34,6 @@
   .gbtn:hover{filter:brightness(.95);}
   .gbtn svg{width:20px; height:20px;}
 
-  /* HEADER */
   header{display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between; margin-bottom:24px;}
   h1{font-size:1.4rem; margin:0; font-weight:600; display:flex; align-items:center; gap:10px;}
   h1 .dot{width:10px; height:10px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); animation:pulse 2s infinite;}
@@ -59,7 +57,6 @@
   .toggle{display:flex; align-items:center; gap:6px; font-size:.85rem; color:var(--muted); cursor:pointer; user-select:none;}
   #lastUpdate{font-size:.8rem; color:var(--muted);}
 
-  /* GLOBAL STATS */
   .global-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:28px;}
   .stat-box{background:linear-gradient(145deg,var(--card),var(--card2)); border:1px solid var(--border); border-radius:10px; padding:18px 20px;}
   .stat-box .label{font-size:.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;}
@@ -67,7 +64,6 @@
 
   .sect-title{font-size:1rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin:0 0 16px;}
 
-  /* GRID */
   .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:20px;}
   .card{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:14px;}
   .card.error{border-color:var(--red);}
@@ -130,7 +126,6 @@
 </head>
 <body>
 
-<!-- ===================== LOGIN ===================== -->
 <div id="loginView" class="login-wrap" style="display:none;">
   <div class="login-card">
     <h1>Hyperliquid Tracker</h1>
@@ -147,7 +142,6 @@
   </div>
 </div>
 
-<!-- ===================== DASHBOARD ===================== -->
 <div id="dashboardView" class="container" style="display:none;">
   <header>
     <h1><span class="dot"></span>Hyperliquid Tracker</h1>
@@ -186,12 +180,8 @@
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-/* ============================================================
-   CONFIGURAZIONE — SOSTITUISCI QUESTI DUE VALORI
-   ============================================================ */
-const SUPABASE_URL      = 'https://XXXXXXXX.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOi...la-tua-anon-key';
-/* ============================================================ */
+const SUPABASE_URL      = 'https://fkstbiiagwoedkhmgwrb.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_lDVVSxspzp0punNsUpEVwQ_v8tuUGkq';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -204,7 +194,6 @@ let spotPrices  = { USDC: 1 };
 let refreshing  = false;
 let autoTimer   = null;
 
-/* ============ UTILITY ============ */
 const usd = (n, dec=2) => (n==null||isNaN(n)) ? '–' : n.toLocaleString('it-IT',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + ' $';
 const signedUsd = (n, dec=2) => (n==null||isNaN(n)) ? '–' : (n>=0?'+':'−') + Math.abs(n).toLocaleString('it-IT',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + ' $';
 const fmtNum = (n) => {
@@ -224,7 +213,6 @@ function toast(msg, isError=false) {
   t._timeout = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-/* ============ AUTH ============ */
 async function initAuth() {
   const { data: { session } } = await supabase.auth.getSession();
   handleSession(session);
@@ -269,7 +257,6 @@ function handleSession(session) {
   }
 }
 
-/* ============ DB: accounts ============ */
 async function loadAccountsFromDB() {
   const { data, error } = await supabase
     .from('tracked_accounts')
@@ -320,7 +307,6 @@ async function removeAccount(id) {
   refreshAll();
 }
 
-/* ============ HYPERLIQUID ============ */
 async function hlPost(body) {
   const res = await fetch(API_URL, {
     method: 'POST',
@@ -412,7 +398,6 @@ async function fetchAccount(account) {
   };
 }
 
-/* ============ REFRESH ============ */
 async function refreshAll() {
   if (refreshing || !currentUser) return;
   refreshing = true;
@@ -448,7 +433,6 @@ async function refreshAll() {
   refreshing = false;
 }
 
-/* ============ RENDER ============ */
 function renderSkeletons(grid, n) {
   grid.innerHTML = '';
   for (let i = 0; i < n; i++) {
@@ -601,20 +585,17 @@ function renderErrorCard(account, err) {
   return c;
 }
 
-/* ============ AUTO-REFRESH ============ */
 function toggleAuto() {
   const on = document.getElementById('autoRefresh').checked;
   if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
   if (on) autoTimer = setInterval(refreshAll, REFRESH_MS);
 }
 
-/* ============ EVENT DELEGATION ============ */
 document.getElementById('accountsGrid').addEventListener('click', e => {
   const btn = e.target.closest('[data-remove]');
   if (btn) removeAccount(btn.getAttribute('data-remove'));
 });
 
-/* ============ INIT ============ */
 initAuth();
 </script>
 </body>
