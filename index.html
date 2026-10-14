@@ -596,6 +596,11 @@ document.getElementById('accountsGrid').addEventListener('click', e => {
   if (btn) removeAccount(btn.getAttribute('data-remove'));
 });
 
+// Collega i pulsanti alle funzioni (necessario perché siamo in un ES module)
+document.getElementById('btnRefresh').addEventListener('click', refreshAll);
+document.getElementById('addAccountBtn').addEventListener('click', addAccount);
+document.getElementById('autoRefresh').addEventListener('change', toggleAuto);
+
 initAuth();
 </script>
 </body>
