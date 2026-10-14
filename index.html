@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hyperliquid Tracker</title>
+<style>
+  :root{
+    --bg:#0d1117; --card:#161b22; --card2:#1c2128; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e;
+    --green:#3fb950; --red:#f85149; --blue:#58a6ff; --purple:#a371f7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text); margin:0; padding:24px; min-height:100vh;
+  }
+  .container{max-width:1400px; margin:0 auto;}
+  a{color:var(--blue);}
+
+  /* LOGIN */
+  .login-wrap{min-height:90vh; display:flex; align-items:center; justify-content:center;}
+  .login-card{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    padding:40px; max-width:420px; width:100%; text-align:center;
+  }
+  .login-card h1{margin:0 0 8px; font-size:1.6rem;}
+  .login-card p{color:var(--muted); font-size:.9rem; margin:0 0 28px;}
+  .gbtn{
+    display:inline-flex; align-items:center; justify-content:center; gap:12px;
+    background:#fff; color:#1f1f1f; border:none; border-radius:8px;
+    padding:12px 20px; font-size:1rem; font-weight:600; cursor:pointer;
+    width:100%; transition:filter .15s;
+  }
+  .gbtn:hover{filter:brightness(.95);}
+  .gbtn svg{width:20px; height:20px;}
+
+  /* HEADER */
+  header{display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between; margin-bottom:24px;}
+  h1{font-size:1.4rem; margin:0; font-weight:600; display:flex; align-items:center; gap:10px;}
+  h1 .dot{width:10px; height:10px; border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+
+  .user-chip{display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--border); border-radius:999px; padding:6px 14px 6px 6px; font-size:.85rem;}
+  .user-chip img{width:28px; height:28px; border-radius:50%;}
+  .user-chip button{background:none; border:none; color:var(--muted); cursor:pointer; font-size:.9rem; padding:0 4px;}
+  .user-chip button:hover{color:var(--red);}
+
+  .controls{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
+  button.primary{
+    background:var(--blue); color:#0d1117; border:none; border-radius:6px;
+    padding:10px 16px; font-weight:600; font-size:.9rem; cursor:pointer; transition:all .15s;
+  }
+  button.primary:hover:not(:disabled){filter:brightness(1.1);}
+  button.primary:disabled{opacity:.5; cursor:not-allowed;}
+  button.secondary{background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:10px 16px; font-weight:600; font-size:.9rem; cursor:pointer;}
+  button.secondary:hover{background:var(--card);}
+
+  .toggle{display:flex; align-items:center; gap:6px; font-size:.85rem; color:var(--muted); cursor:pointer; user-select:none;}
+  #lastUpdate{font-size:.8rem; color:var(--muted);}
+
+  /* GLOBAL STATS */
+  .global-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:28px;}
+  .stat-box{background:linear-gradient(145deg,var(--card),var(--card2)); border:1px solid var(--border); border-radius:10px; padding:18px 20px;}
+  .stat-box .label{font-size:.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;}
+  .stat-box .value{font-size:1.6rem; font-weight:700; font-family:ui-monospace,Menlo,monospace;}
+
+  .sect-title{font-size:1rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin:0 0 16px;}
+
+  /* GRID */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:20px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:14px;}
+  .card.error{border-color:var(--red);}
+  .card-header{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .card-header h3{margin:0; font-size:1.1rem;}
+  .addr{font-family:ui-monospace,monospace; font-size:.7rem; color:var(--muted); margin-top:2px;}
+  .remove-btn{background:transparent; color:var(--muted); border:none; padding:4px 8px; font-size:1.1rem; line-height:1; cursor:pointer; border-radius:4px;}
+  .remove-btn:hover{color:var(--red); background:rgba(248,81,73,.1);}
+
+  .big-equity{font-size:1.6rem; font-weight:700; font-family:ui-monospace,Menlo,monospace;}
+  .row{display:flex; justify-content:space-between; align-items:center; font-size:.85rem; margin-bottom:4px;}
+  .row .k{color:var(--muted);}
+  .row .v{font-family:ui-monospace,monospace; font-weight:600;}
+
+  .bar{height:6px; background:var(--card2); border-radius:3px; overflow:hidden; display:flex; margin-top:4px;}
+  .bar .perp{background:var(--purple); height:100%;}
+  .bar .spot{background:var(--blue); height:100%;}
+
+  .section-divider{border-top:1px dashed var(--border); margin:4px 0;}
+  .sub-title{font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; font-weight:600;}
+
+  .position{background:var(--card2); border-radius:6px; padding:10px 12px; border-left:3px solid var(--muted); margin-bottom:6px; font-size:.85rem;}
+  .position.long{border-left-color:var(--green);}
+  .position.short{border-left-color:var(--red);}
+  .position.spot{border-left-color:var(--blue);}
+  .pos-head{display:flex; justify-content:space-between; align-items:center; font-weight:600;}
+  .pos-details{display:grid; grid-template-columns:1fr 1fr; gap:2px 10px; font-size:.72rem; color:var(--muted); margin-top:6px; font-family:ui-monospace,monospace;}
+  .pos-details b{color:var(--text); font-weight:500;}
+
+  .empty{color:var(--muted); font-style:italic; font-size:.8rem; padding:4px 0; text-align:center;}
+  .green{color:var(--green);}
+  .red{color:var(--red);}
+  .muted{color:var(--muted);}
+
+  .add-account{background:var(--card); border:1px dashed var(--border); border-radius:10px; padding:16px; margin-top:28px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
+  .add-account input{
+    background:var(--bg); border:1px solid var(--border); color:var(--text);
+    padding:10px 12px; border-radius:6px; font-size:.9rem; font-family:inherit; flex:1; min-width:180px;
+  }
+  .add-account input:focus{outline:none; border-color:var(--blue);}
+
+  .skeleton{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:4px; height:14px;}
+  @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    background:var(--card); border:1px solid var(--border); color:var(--text);
+    padding:12px 20px; border-radius:8px; box-shadow:0 8px 32px rgba(0,0,0,.5);
+    font-size:.9rem; z-index:1000; opacity:0; transition:opacity .2s;
+  }
+  .toast.show{opacity:1;}
+  .toast.error{border-color:var(--red);}
+
+  @media (max-width:600px){
+    body{padding:14px;}
+    .stat-box .value{font-size:1.3rem;}
+    .big-equity{font-size:1.4rem;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="loginView" class="login-wrap" style="display:none;">
+  <div class="login-card">
+    <h1>Hyperliquid Tracker</h1>
+    <p>Monitora Perps e Spot di più wallet in un'unica dashboard.</p>
+    <button class="gbtn" id="googleBtn">
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z"/>
+        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-3.1-11.3-8l-6.5 5C9.6 39.6 16.2 44 24 44z"/>
+        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.2-.1-2.4-.4-3.5z"/>
+      </svg>
+      Accedi con Google
+    </button>
+  </div>
+</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+<div id="dashboardView" class="container" style="display:none;">
+  <header>
+    <h1><span class="dot"></span>Hyperliquid Tracker</h1>
+    <div class="controls">
+      <label class="toggle"><input type="checkbox" id="autoRefresh" onchange="toggleAuto()"> Auto 60s</label>
+      <span id="lastUpdate"></span>
+      <button class="primary" id="btnRefresh" onclick="refreshAll()">Aggiorna</button>
+      <div class="user-chip">
+        <img id="userAvatar" alt="">
+        <span id="userEmail"></span>
+        <button id="logoutBtn" title="Esci">⏻</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="global-stats">
+    <div class="stat-box"><div class="label">Equity Totale</div><div class="value" id="gTotal">–</div></div>
+    <div class="stat-box"><div class="label">Perps</div><div class="value" id="gPerps">–</div></div>
+    <div class="stat-box"><div class="label">Spot</div><div class="value" id="gSpot">–</div></div>
+    <div class="stat-box"><div class="label">PnL Non Realizzato</div><div class="value" id="gPnl">–</div></div>
+    <div class="stat-box"><div class="label">Margine Usato</div><div class="value" id="gMargin">–</div></div>
+  </div>
+
+  <h2 class="sect-title">I tuoi conti</h2>
+  <div id="accountsGrid" class="grid"></div>
+
+  <div class="add-account">
+    <input type="text" id="newName" placeholder="Nome (es. MARIO)" maxlength="30">
+    <input type="text" id="newAddress" placeholder="0x..." spellcheck="false">
+    <button class="primary" onclick="addAccount()">+ Aggiungi conto</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+/* ============================================================
+   CONFIGURAZIONE — SOSTITUISCI QUESTI DUE VALORI
+   ============================================================ */
+const SUPABASE_URL      = 'https://XXXXXXXX.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOi...la-tua-anon-key';
+/* ============================================================ */
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const API_URL    = 'https://api.hyperliquid.xyz/info';
+const REFRESH_MS = 60_000;
+
+let currentUser = null;
+let accounts    = [];
+let spotPrices  = { USDC: 1 };
+let refreshing  = false;
+let autoTimer   = null;
+
+/* ============ UTILITY ============ */
+const usd = (n, dec=2) => (n==null||isNaN(n)) ? '–' : n.toLocaleString('it-IT',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + ' $';
+const signedUsd = (n, dec=2) => (n==null||isNaN(n)) ? '–' : (n>=0?'+':'−') + Math.abs(n).toLocaleString('it-IT',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + ' $';
+const fmtNum = (n) => {
+  if (n==null||isNaN(n)) return '–';
+  const a = Math.abs(n);
+  const d = a===0?2 : a<1?6 : a<100?4 : 2;
+  return n.toLocaleString('it-IT',{maximumFractionDigits:d});
+};
+const shortAddr = (a) => a.slice(0,6) + '...' + a.slice(-4);
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function toast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ============ AUTH ============ */
+async function initAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  handleSession(session);
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    handleSession(session);
+  });
+
+  document.getElementById('googleBtn').addEventListener('click', () => {
+    supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin }
+    });
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await supabase.auth.signOut();
+    location.reload();
+  });
+}
+
+function handleSession(session) {
+  const loginView = document.getElementById('loginView');
+  const dashView  = document.getElementById('dashboardView');
+
+  if (session?.user) {
+    currentUser = session.user;
+    loginView.style.display = 'none';
+    dashView.style.display  = 'block';
+
+    const meta = currentUser.user_metadata || {};
+    document.getElementById('userEmail').textContent = currentUser.email || '';
+    const avatar = document.getElementById('userAvatar');
+    if (meta.avatar_url) { avatar.src = meta.avatar_url; avatar.style.display=''; }
+    else { avatar.style.display='none'; }
+
+    loadAccountsFromDB();
+  } else {
+    currentUser = null;
+    loginView.style.display = 'flex';
+    dashView.style.display  = 'none';
+  }
+}
+
+/* ============ DB: accounts ============ */
+async function loadAccountsFromDB() {
+  const { data, error } = await supabase
+    .from('tracked_accounts')
+    .select('id, name, address, created_at')
+    .order('created_at', { ascending: true });
+
+  if (error) { toast('Errore caricamento conti: ' + error.message, true); return; }
+
+  accounts = (data || []).map(r => ({ id: r.id, name: r.name, address: r.address }));
+  refreshAll();
+}
+
+async function addAccount() {
+  const nameEl = document.getElementById('newName');
+  const addrEl = document.getElementById('newAddress');
+  const name   = nameEl.value.trim();
+  const addr   = addrEl.value.trim();
+
+  if (!name || !addr)                return toast('Inserisci nome e indirizzo', true);
+  if (!/^0x[a-fA-F0-9]{40}$/.test(addr))
+    return toast('Indirizzo non valido (0x + 40 hex)', true);
+
+  const { data, error } = await supabase
+    .from('tracked_accounts')
+    .insert({ user_id: currentUser.id, name, address: addr })
+    .select('id, name, address')
+    .single();
+
+  if (error) {
+    if (error.code === '23505') return toast('Indirizzo già presente', true);
+    return toast('Errore: ' + error.message, true);
+  }
+
+  accounts.push(data);
+  nameEl.value = ''; addrEl.value = '';
+  toast('Conto aggiunto');
+  refreshAll();
+}
+
+async function removeAccount(id) {
+  if (!confirm('Rimuovere questo conto?')) return;
+
+  const { error } = await supabase.from('tracked_accounts').delete().eq('id', id);
+  if (error) return toast('Errore: ' + error.message, true);
+
+  accounts = accounts.filter(a => a.id !== id);
+  toast('Conto rimosso');
+  refreshAll();
+}
+
+/* ============ HYPERLIQUID ============ */
+async function hlPost(body) {
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+async function fetchSpotPrices() {
+  const data = await hlPost({ type: 'spotMetaAndAssetCtxs' });
+  const prices = { USDC: 1 };
+  if (!Array.isArray(data) || data.length < 2) return prices;
+
+  const [meta, ctxs] = data;
+  const tokens   = meta.tokens   || [];
+  const universe = meta.universe || [];
+  const tokenByIdx = {};
+  tokens.forEach(t => { tokenByIdx[t.index] = t.name; });
+
+  universe.forEach((pair, i) => {
+    if (!pair || !pair.tokens) return;
+    const name = tokenByIdx[pair.tokens[0]];
+    const ctx  = ctxs[i];
+    if (name && ctx && ctx.markPx && !(name in prices)) {
+      prices[name] = parseFloat(ctx.markPx);
+    }
+  });
+  return prices;
+}
+
+async function fetchAccount(account) {
+  const user = account.address.toLowerCase();
+
+  const [perpRes, spotRes] = await Promise.allSettled([
+    hlPost({ type: 'clearinghouseState',     user }),
+    hlPost({ type: 'spotClearinghouseState', user })
+  ]);
+
+  const perp = perpRes.status === 'fulfilled' ? perpRes.value : null;
+  const spot = spotRes.status === 'fulfilled' ? spotRes.value : null;
+  if (!perp && !spot) throw new Error('Nessun dato disponibile');
+
+  const ms         = (perp && perp.marginSummary) || {};
+  const perpEquity = parseFloat(ms.accountValue    || 0);
+  const marginUsed = parseFloat(ms.totalMarginUsed || 0);
+  const withdrawable = parseFloat((perp && perp.withdrawable) || 0);
+
+  const positions = ((perp && perp.assetPositions) || []).map(p => {
+    const pos  = p.position || {};
+    const size = parseFloat(pos.szi || 0);
+    return {
+      coin: pos.coin,
+      size,
+      entry:    parseFloat(pos.entryPx || 0) || null,
+      value:    parseFloat(pos.positionValue || 0),
+      pnl:      parseFloat(pos.unrealizedPnl || 0),
+      liq:      pos.liquidationPx ? parseFloat(pos.liquidationPx) : null,
+      leverage: pos.leverage ? pos.leverage.value : null,
+      roe:      pos.returnOnEquity != null ? parseFloat(pos.returnOnEquity) * 100 : null
+    };
+  }).filter(p => p.size !== 0);
+  positions.sort((a,b) => Math.abs(b.value) - Math.abs(a.value));
+
+  const spotHoldings = [];
+  let spotEquity = 0;
+  if (spot && Array.isArray(spot.balances)) {
+    spot.balances.forEach(b => {
+      const total = parseFloat(b.total || 0);
+      if (total <= 0) return;
+      const price = spotPrices[b.coin] ?? 0;
+      const value = total * price;
+      spotEquity += value;
+      spotHoldings.push({ coin: b.coin, amount: total, price, value });
+    });
+  }
+  spotHoldings.sort((a,b) => b.value - a.value);
+
+  const unrealizedPnl = positions.reduce((s,p) => s + p.pnl, 0);
+
+  return {
+    account,
+    perpEquity, marginUsed, withdrawable,
+    positions,
+    spotEquity, spotHoldings,
+    totalEquity: perpEquity + spotEquity,
+    unrealizedPnl
+  };
+}
+
+/* ============ REFRESH ============ */
+async function refreshAll() {
+  if (refreshing || !currentUser) return;
+  refreshing = true;
+
+  const btn  = document.getElementById('btnRefresh');
+  const grid = document.getElementById('accountsGrid');
+  btn.disabled = true; btn.textContent = 'Aggiornamento...';
+
+  if (accounts.length === 0) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:40px;">Nessun conto. Aggiungine uno qui sotto 👇</div>';
+    document.getElementById('gTotal').textContent  = '–';
+    document.getElementById('gPerps').textContent  = '–';
+    document.getElementById('gSpot').textContent   = '–';
+    document.getElementById('gPnl').textContent    = '–';
+    document.getElementById('gMargin').textContent = '–';
+    btn.disabled = false; btn.textContent = 'Aggiorna'; refreshing = false;
+    return;
+  }
+
+  renderSkeletons(grid, accounts.length);
+
+  try { spotPrices = await fetchSpotPrices(); }
+  catch(e) { console.warn('Prezzi spot non disponibili', e); spotPrices = { USDC: 1 }; }
+
+  const results = await Promise.all(accounts.map(a =>
+    fetchAccount(a).catch(err => ({ error: err.message || String(err), account: a }))
+  ));
+
+  renderResults(results);
+  document.getElementById('lastUpdate').textContent = 'Ultimo: ' + new Date().toLocaleTimeString('it-IT');
+
+  btn.disabled = false; btn.textContent = 'Aggiorna';
+  refreshing = false;
+}
+
+/* ============ RENDER ============ */
+function renderSkeletons(grid, n) {
+  grid.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('div');
+    c.className = 'card';
+    c.innerHTML = `
+      <div class="skeleton" style="width:50%;height:18px;"></div>
+      <div class="skeleton" style="width:80%;height:26px;"></div>
+      <div class="skeleton" style="width:100%;"></div>
+      <div class="skeleton" style="width:100%;"></div>
+      <div class="skeleton" style="width:100%;"></div>`;
+    grid.appendChild(c);
+  }
+}
+
+function renderResults(results) {
+  const grid = document.getElementById('accountsGrid');
+  grid.innerHTML = '';
+
+  let totPerp = 0, totSpot = 0, totPnl = 0, totMargin = 0, totEquity = 0;
+  results.forEach(r => {
+    if (r.error) return;
+    totPerp   += r.perpEquity;
+    totSpot   += r.spotEquity;
+    totPnl    += r.unrealizedPnl;
+    totMargin += r.marginUsed;
+    totEquity += r.totalEquity;
+  });
+
+  document.getElementById('gTotal').textContent  = usd(totEquity);
+  document.getElementById('gPerps').textContent  = usd(totPerp);
+  document.getElementById('gSpot').textContent   = usd(totSpot);
+  document.getElementById('gMargin').textContent = usd(totMargin);
+  const pnlEl = document.getElementById('gPnl');
+  pnlEl.textContent = signedUsd(totPnl);
+  pnlEl.className = 'value ' + (totPnl >= 0 ? 'green' : 'red');
+
+  results.forEach(r => {
+    grid.appendChild(r.error ? renderErrorCard(r.account, r.error) : renderAccountCard(r, totEquity));
+  });
+}
+
+function renderAccountCard(data, grandTotal) {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  const { account, perpEquity, spotEquity, totalEquity, marginUsed, withdrawable,
+          positions, spotHoldings, unrealizedPnl } = data;
+
+  const sharePct = grandTotal > 0 ? (totalEquity / grandTotal) * 100 : 0;
+  const perpPct  = totalEquity > 0 ? (perpEquity / totalEquity) * 100 : 0;
+  const spotPct  = totalEquity > 0 ? (spotEquity / totalEquity) * 100 : 0;
+
+  let posHtml = positions.length === 0
+    ? '<div class="empty">Nessuna posizione aperta</div>'
+    : positions.map(p => {
+        const isLong   = p.size > 0;
+        const pnlClass = p.pnl >= 0 ? 'green' : 'red';
+        return `
+          <div class="position ${isLong ? 'long' : 'short'}">
+            <div class="pos-head">
+              <span>${esc(p.coin)}
+                <span class="muted" style="font-weight:400;font-size:.72rem;">
+                  ${isLong?'LONG':'SHORT'}${p.leverage?' · '+p.leverage+'x':''}
+                </span>
+              </span>
+              <span class="${pnlClass}">${signedUsd(p.pnl)}</span>
+            </div>
+            <div class="pos-details">
+              <span>Size: <b>${fmtNum(Math.abs(p.size))}</b></span>
+              <span>Valore: <b>${usd(Math.abs(p.value))}</b></span>
+              <span>Entry: <b>${p.entry ? fmtNum(p.entry) : '–'}</b></span>
+              <span>Liq: <b>${p.liq ? fmtNum(p.liq) : '–'}</b></span>
+              ${p.roe != null ? `<span>ROE: <b class="${p.roe>=0?'green':'red'}">${p.roe>=0?'+':''}${p.roe.toFixed(2)}%</b></span>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+
+  let spotHtml = spotHoldings.length === 0
+    ? '<div class="empty">Nessun saldo spot</div>'
+    : spotHoldings.map(s => `
+        <div class="position spot">
+          <div class="pos-head">
+            <span>${esc(s.coin)}</span>
+            <span>${usd(s.value)}</span>
+          </div>
+          <div class="pos-details">
+            <span>Q.tà: <b>${fmtNum(s.amount)}</b></span>
+            <span>Prezzo: <b>${s.price ? fmtNum(s.price) : '–'}</b></span>
+          </div>
+        </div>`).join('');
+
+  card.innerHTML = `
+    <div class="card-header">
+      <div>
+        <h3>${esc(account.name)}</h3>
+        <div class="addr">${shortAddr(account.address)}</div>
+      </div>
+      <button class="remove-btn" title="Rimuovi conto" data-remove="${account.id}">×</button>
+    </div>
+
+    <div>
+      <div class="big-equity">${usd(totalEquity)}</div>
+      <div class="muted" style="font-size:.75rem;margin-top:2px;">${sharePct.toFixed(1)}% del totale</div>
+    </div>
+
+    <div>
+      <div class="bar">
+        <div class="perp" style="width:${perpPct}%"></div>
+        <div class="spot" style="width:${spotPct}%"></div>
+      </div>
+      <div style="margin-top:10px;">
+        <div class="row"><span class="k">Perps</span><span class="v">${usd(perpEquity)}</span></div>
+        <div class="row"><span class="k">Spot</span><span class="v">${usd(spotEquity)}</span></div>
+        <div class="row"><span class="k">PnL non realizzato</span><span class="v ${unrealizedPnl>=0?'green':'red'}">${signedUsd(unrealizedPnl)}</span></div>
+        <div class="row"><span class="k">Margine usato</span><span class="v">${usd(marginUsed)}</span></div>
+        <div class="row"><span class="k">Prelevabile</span><span class="v">${usd(withdrawable)}</span></div>
+      </div>
+    </div>
+
+    <div class="section-divider"></div>
+    <div>
+      <div class="sub-title">Posizioni Perps (${positions.length})</div>
+      ${posHtml}
+    </div>
+
+    <div class="section-divider"></div>
+    <div>
+      <div class="sub-title">Saldo Spot (${spotHoldings.length})</div>
+      ${spotHtml}
+    </div>
+  `;
+
+  return card;
+}
+
+function renderErrorCard(account, err) {
+  const c = document.createElement('div');
+  c.className = 'card error';
+  c.innerHTML = `
+    <div class="card-header">
+      <div>
+        <h3>${esc(account.name)}</h3>
+        <div class="addr">${shortAddr(account.address)}</div>
+      </div>
+      <button class="remove-btn" data-remove="${account.id}">×</button>
+    </div>
+    <div class="red" style="font-weight:600;">Dati non disponibili</div>
+    <div class="muted" style="font-size:.8rem;">${esc(err)}</div>`;
+  return c;
+}
+
+/* ============ AUTO-REFRESH ============ */
+function toggleAuto() {
+  const on = document.getElementById('autoRefresh').checked;
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; }
+  if (on) autoTimer = setInterval(refreshAll, REFRESH_MS);
+}
+
+/* ============ EVENT DELEGATION ============ */
+document.getElementById('accountsGrid').addEventListener('click', e => {
+  const btn = e.target.closest('[data-remove]');
+  if (btn) removeAccount(btn.getAttribute('data-remove'));
+});
+
+/* ============ INIT ============ */
+initAuth();
+</script>
+</body>
+</html>
