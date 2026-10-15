@@ -9,7 +9,7 @@
     --bg:#0d1117; --card:#161b22; --card2:#1c2128; --border:#30363d;
     --text:#e6edf3; --muted:#8b949e;
     --green:#3fb950; --red:#f85149; --blue:#58a6ff; --purple:#a371f7;
-    --yellow:#d29922; --orange:#f0883e;
+    --yellow:#d29922;
   }
   *{box-sizing:border-box;}
   body{
@@ -17,21 +17,12 @@
     background:var(--bg); color:var(--text); margin:0; padding:24px; min-height:100vh;
   }
   .container{max-width:1400px; margin:0 auto;}
-  a{color:var(--blue);}
 
   .login-wrap{min-height:90vh; display:flex; align-items:center; justify-content:center;}
-  .login-card{
-    background:var(--card); border:1px solid var(--border); border-radius:14px;
-    padding:40px; max-width:420px; width:100%; text-align:center;
-  }
+  .login-card{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:40px; max-width:420px; width:100%; text-align:center;}
   .login-card h1{margin:0 0 8px; font-size:1.6rem;}
   .login-card p{color:var(--muted); font-size:.9rem; margin:0 0 28px;}
-  .gbtn{
-    display:inline-flex; align-items:center; justify-content:center; gap:12px;
-    background:#fff; color:#1f1f1f; border:none; border-radius:8px;
-    padding:12px 20px; font-size:1rem; font-weight:600; cursor:pointer;
-    width:100%; transition:filter .15s;
-  }
+  .gbtn{display:inline-flex; align-items:center; justify-content:center; gap:12px; background:#fff; color:#1f1f1f; border:none; border-radius:8px; padding:12px 20px; font-size:1rem; font-weight:600; cursor:pointer; width:100%; transition:filter .15s;}
   .gbtn:hover{filter:brightness(.95);}
   .gbtn svg{width:20px; height:20px;}
 
@@ -46,26 +37,21 @@
   .user-chip button:hover{color:var(--red);}
 
   .controls{display:flex; gap:12px; align-items:center; flex-wrap:wrap;}
-  button.primary{
-    background:var(--blue); color:#0d1117; border:none; border-radius:6px;
-    padding:10px 16px; font-weight:600; font-size:.9rem; cursor:pointer; transition:all .15s;
-  }
+  button.primary{background:var(--blue); color:#0d1117; border:none; border-radius:6px; padding:10px 16px; font-weight:600; font-size:.9rem; cursor:pointer; transition:all .15s;}
   button.primary:hover:not(:disabled){filter:brightness(1.1);}
   button.primary:disabled{opacity:.5; cursor:not-allowed;}
-  button.secondary{background:var(--card2); color:var(--text); border:1px solid var(--border); border-radius:6px; padding:10px 16px; font-weight:600; font-size:.9rem; cursor:pointer;}
-  button.secondary:hover{background:var(--card);}
 
   .toggle{display:flex; align-items:center; gap:6px; font-size:.85rem; color:var(--muted); cursor:pointer; user-select:none;}
   #lastUpdate{font-size:.8rem; color:var(--muted);}
 
-  .global-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px; margin-bottom:28px;}
+  .global-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:28px;}
   .stat-box{background:linear-gradient(145deg,var(--card),var(--card2)); border:1px solid var(--border); border-radius:10px; padding:18px 20px;}
-  .stat-box .label{font-size:.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;}
-  .stat-box .value{font-size:1.6rem; font-weight:700; font-family:ui-monospace,Menlo,monospace;}
+  .stat-box .label{font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;}
+  .stat-box .value{font-size:1.5rem; font-weight:700; font-family:ui-monospace,Menlo,monospace;}
 
   .sect-title{font-size:1rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin:0 0 16px;}
 
-  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:20px;}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:20px;}
   .card{background:var(--card); border:1px solid var(--border); border-radius:10px; padding:18px; display:flex; flex-direction:column; gap:14px;}
   .card.error{border-color:var(--red);}
   .card-header{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
@@ -74,7 +60,8 @@
   .remove-btn{background:transparent; color:var(--muted); border:none; padding:4px 8px; font-size:1.1rem; line-height:1; cursor:pointer; border-radius:4px;}
   .remove-btn:hover{color:var(--red); background:rgba(248,81,73,.1);}
 
-  .big-equity{font-size:1.6rem; font-weight:700; font-family:ui-monospace,Menlo,monospace;}
+  .big-equity{font-size:1.7rem; font-weight:700; font-family:ui-monospace,Menlo,monospace;}
+  .big-label{font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:2px;}
   .row{display:flex; justify-content:space-between; align-items:center; font-size:.85rem; margin-bottom:4px;}
   .row .k{color:var(--muted);}
   .row .v{font-family:ui-monospace,monospace; font-weight:600;}
@@ -82,6 +69,10 @@
   .bar{height:6px; background:var(--card2); border-radius:3px; overflow:hidden; display:flex; margin-top:4px;}
   .bar .used{background:var(--purple); height:100%;}
   .bar .free{background:var(--blue); height:100%;}
+  .bar.risk{height:4px; margin-top:6px;}
+  .bar.risk .r{background:var(--green); height:100%;}
+  .bar.risk .r.medium{background:var(--yellow);}
+  .bar.risk .r.high{background:var(--red);}
 
   .section-divider{border-top:1px dashed var(--border); margin:4px 0;}
   .sub-title{font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; font-weight:600;}
@@ -97,64 +88,41 @@
   .empty{color:var(--muted); font-style:italic; font-size:.8rem; padding:4px 0; text-align:center;}
   .green{color:var(--green);}
   .red{color:var(--red);}
+  .yellow{color:var(--yellow);}
   .muted{color:var(--muted);}
 
+  /* RISK BADGE */
+  .risk-badge{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:6px; font-size:.75rem; font-weight:600;}
+  .risk-badge.low{background:rgba(63,185,80,.12); color:var(--green); border:1px solid rgba(63,185,80,.3);}
+  .risk-badge.medium{background:rgba(210,153,34,.12); color:var(--yellow); border:1px solid rgba(210,153,34,.3);}
+  .risk-badge.high{background:rgba(248,81,73,.12); color:var(--red); border:1px solid rgba(248,81,73,.3);}
+
+  /* P&L CHART */
+  .pnl-chart{display:flex; align-items:flex-end; gap:3px; height:60px; margin-top:6px; padding:0 2px;}
+  .pnl-bar{flex:1; min-height:2px; border-radius:2px 2px 0 0; transition:filter .15s; cursor:pointer; position:relative;}
+  .pnl-bar:hover{filter:brightness(1.3);}
+  .pnl-bar.pos{background:var(--green);}
+  .pnl-bar.neg{background:var(--red);}
+  .pnl-bar.zero{background:var(--muted);}
+  .pnl-axis{display:flex; justify-content:space-between; font-size:.65rem; color:var(--muted); margin-top:4px;}
+  .pnl-total{font-family:ui-monospace,monospace; font-weight:700;}
+
   .add-account{background:var(--card); border:1px dashed var(--border); border-radius:10px; padding:16px; margin-top:28px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;}
-  .add-account input{
-    background:var(--bg); border:1px solid var(--border); color:var(--text);
-    padding:10px 12px; border-radius:6px; font-size:.9rem; font-family:inherit; flex:1; min-width:180px;
-  }
+  .add-account input{background:var(--bg); border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:6px; font-size:.9rem; font-family:inherit; flex:1; min-width:180px;}
   .add-account input:focus{outline:none; border-color:var(--blue);}
 
   .skeleton{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%); background-size:200% 100%; animation:shimmer 1.5s infinite; border-radius:4px; height:14px;}
   @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 
-  .toast{
-    position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-    background:var(--card); border:1px solid var(--border); color:var(--text);
-    padding:12px 20px; border-radius:8px; box-shadow:0 8px 32px rgba(0,0,0,.5);
-    font-size:.9rem; z-index:1000; opacity:0; transition:opacity .2s;
-  }
+  .toast{position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--card); border:1px solid var(--border); color:var(--text); padding:12px 20px; border-radius:8px; box-shadow:0 8px 32px rgba(0,0,0,.5); font-size:.9rem; z-index:1000; opacity:0; transition:opacity .2s;}
   .toast.show{opacity:1;}
   .toast.error{border-color:var(--red);}
 
   .hint{font-size:.7rem; color:var(--muted); font-style:italic; margin-top:-4px;}
 
-  /* ==== RATIO BAR ==== */
-  .ratio-bar{
-    height:8px; background:var(--card2); border-radius:4px; overflow:hidden; margin-top:4px;
-  }
-  .ratio-bar .fill{
-    height:100%; border-radius:4px; transition:width .3s, background .3s;
-  }
-  .ratio-bar .fill.safe    { background: var(--green); }
-  .ratio-bar .fill.warning { background: var(--yellow); }
-  .ratio-bar .fill.danger  { background: var(--red); }
-
-  /* ==== HISTORY CHART ==== */
-  .history-chart{
-    display:flex; align-items:flex-end; gap:3px; height:70px;
-    padding:6px 0; overflow-x:auto;
-  }
-  .history-chart .bar-col{
-    display:flex; flex-direction:column; align-items:center; flex:1; min-width:14px;
-  }
-  .history-chart .bar-col .bar-fill{
-    width:100%; border-radius:2px 2px 0 0; min-height:1px; transition:height .3s;
-  }
-  .history-chart .bar-col .bar-fill.pos { background: var(--green); }
-  .history-chart .bar-col .bar-fill.neg { background: var(--red); }
-  .history-chart .bar-col .bar-label{
-    font-size:.6rem; color:var(--muted); margin-top:2px; font-family:ui-monospace,monospace;
-  }
-  .history-summary{
-    display:flex; justify-content:space-between; font-size:.75rem; margin-top:6px; font-family:ui-monospace,monospace;
-  }
-  .history-summary .lbl{color:var(--muted);}
-
   @media (max-width:600px){
     body{padding:14px;}
-    .stat-box .value{font-size:1.3rem;}
+    .stat-box .value{font-size:1.2rem;}
     .big-equity{font-size:1.4rem;}
   }
 </style>
@@ -193,11 +161,12 @@
   </header>
 
   <div class="global-stats">
+    <div class="stat-box"><div class="label">Net Portfolio</div><div class="value" id="gNet">–</div></div>
     <div class="stat-box"><div class="label">Total Balance</div><div class="value" id="gTotal">–</div></div>
     <div class="stat-box"><div class="label">Available</div><div class="value" id="gAvailable">–</div></div>
-    <div class="stat-box"><div class="label">Rischio Max</div><div class="value" id="gRatio">–</div></div>
     <div class="stat-box"><div class="label">PnL Non Realizzato</div><div class="value" id="gPnl">–</div></div>
     <div class="stat-box"><div class="label">Margine Usato</div><div class="value" id="gMargin">–</div></div>
+    <div class="stat-box"><div class="label">Rischio Medio</div><div class="value" id="gRisk">–</div></div>
   </div>
 
   <h2 class="sect-title">I tuoi conti</h2>
@@ -251,16 +220,10 @@ function toast(msg, isError=false) {
 async function initAuth() {
   const { data: { session } } = await supabase.auth.getSession();
   handleSession(session);
-
-  supabase.auth.onAuthStateChange((_event, session) => {
-    handleSession(session);
-  });
+  supabase.auth.onAuthStateChange((_event, session) => handleSession(session));
 
   document.getElementById('googleBtn').addEventListener('click', () => {
-    supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin }
-    });
+    supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
   });
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -299,7 +262,6 @@ async function loadAccountsFromDB() {
     .order('created_at', { ascending: true });
 
   if (error) { toast('Errore caricamento conti: ' + error.message, true); return; }
-
   accounts = (data || []).map(r => ({ id: r.id, name: r.name, address: r.address }));
   refreshAll();
 }
@@ -333,10 +295,8 @@ async function addAccount() {
 
 async function removeAccount(id) {
   if (!confirm('Rimuovere questo conto?')) return;
-
   const { error } = await supabase.from('tracked_accounts').delete().eq('id', id);
   if (error) return toast('Errore: ' + error.message, true);
-
   accounts = accounts.filter(a => a.id !== id);
   toast('Conto rimosso');
   refreshAll();
@@ -374,61 +334,36 @@ async function fetchSpotPrices() {
   return prices;
 }
 
-/* ============ UNIFIED ACCOUNT RATIO ============ */
-function computeUnifiedRatio(perp, spot) {
-  if (!perp || !spot) return null;
-
-  // crossMaintenanceMarginUsed dal clearinghouseState
-  const crossMaintenance = parseFloat(perp.crossMaintenanceMarginUsed || 0);
-
-  // Margine isolato: somma dei marginUsed delle posizioni con leverage isolato
-  const positions = perp.assetPositions || [];
-  let isolatedMargin = 0;
-  positions.forEach(p => {
-    const pos = p.position || {};
-    if (pos.leverage && pos.leverage.type === 'isolated') {
-      isolatedMargin += parseFloat(pos.marginUsed || 0);
-    }
-  });
-
-  // Saldo spot USDC
-  const balances = spot.balances || [];
-  const usdcBalance = balances.find(b => b.coin === 'USDC');
-  const spotUSDC = usdcBalance ? parseFloat(usdcBalance.total || 0) : 0;
-
-  const available = spotUSDC - isolatedMargin;
-  if (available <= 0) return 0;
-
-  return crossMaintenance / available;
-}
-
-/* ============ PORTFOLIO HISTORY ============ */
-async function fetchPortfolioHistory(user) {
+/* === STORICO P&L GIORNALIERO === */
+async function fetchDailyPnl(address) {
   try {
-    const data = await hlPost({ type: 'portfolio', user });
-    // La risposta può essere un array di periodi o un singolo oggetto
-    const periods = Array.isArray(data) ? data : [data];
+    const data = await hlPost({ type: 'portfolio', user: address.toLowerCase() });
+    if (!Array.isArray(data)) return null;
 
-    // Cerchiamo il periodo "week" o "day"
-    const week = periods.find(p => p.period === 'week');
-    const day  = periods.find(p => p.period === 'day');
-    const target = week || day;
+    const weekEntry = data.find(x => Array.isArray(x) && x[0] === 'week');
+    if (!weekEntry || !weekEntry[1]) return null;
 
-    if (!target || !Array.isArray(target.pnlHistory)) return null;
+    const pnlHistory = weekEntry[1].pnlHistory || [];
+    if (pnlHistory.length < 2) return null;
 
-    return {
-      period: target.period,
-      pnlHistory: target.pnlHistory.map(([ts, pnl]) => ({
-        ts: Number(ts),
-        pnl: parseFloat(pnl)
-      })),
-      accountValueHistory: (target.accountValueHistory || []).map(([ts, v]) => ({
-        ts: Number(ts),
-        value: parseFloat(v)
-      }))
-    };
+    // Raggruppa per giorno (YYYY-MM-DD), tieni l'ultimo valore cumulativo del giorno
+    const dayMap = {};
+    pnlHistory.forEach(([ts, v]) => {
+      const d = new Date(ts).toISOString().slice(0,10);
+      dayMap[d] = parseFloat(v);
+    });
+
+    const days = Object.keys(dayMap).sort();
+    const result = [];
+    for (let i = 1; i < days.length; i++) {
+      result.push({
+        date: days[i],
+        pnl: dayMap[days[i]] - dayMap[days[i-1]]
+      });
+    }
+    return result;
   } catch(e) {
-    console.warn('Portfolio history non disponibile', e);
+    console.warn('Portfolio fetch failed for', address, e);
     return null;
   }
 }
@@ -436,18 +371,27 @@ async function fetchPortfolioHistory(user) {
 async function fetchAccount(account) {
   const user = account.address.toLowerCase();
 
-  const [perpRes, spotRes] = await Promise.allSettled([
+  const [perpRes, spotRes, pnlRes] = await Promise.allSettled([
     hlPost({ type: 'clearinghouseState',     user }),
-    hlPost({ type: 'spotClearinghouseState', user })
+    hlPost({ type: 'spotClearinghouseState', user }),
+    fetchDailyPnl(user)
   ]);
 
   const perp = perpRes.status === 'fulfilled' ? perpRes.value : null;
   const spot = spotRes.status === 'fulfilled' ? spotRes.value : null;
+  const dailyPnl = pnlRes.status === 'fulfilled' ? pnlRes.value : null;
+
   if (!perp && !spot) throw new Error('Nessun dato disponibile');
 
   const ms         = (perp && perp.marginSummary) || {};
   const perpEquity = parseFloat(ms.accountValue    || 0);
   const marginUsed = parseFloat(ms.totalMarginUsed || 0);
+
+  // Risk ratio: maintenance margin / account value
+  const maintenanceMargin = parseFloat((perp && perp.crossMaintenanceMarginUsed) || 0);
+  // Per unified account usa il valore totale (spot + perps pnl); fallback su perpEquity
+  const accountValue = perpEquity || 0;
+  const riskRatio = accountValue > 0 ? (maintenanceMargin / accountValue) * 100 : 0;
 
   const positions = ((perp && perp.assetPositions) || []).map(p => {
     const pos  = p.position || {};
@@ -460,8 +404,6 @@ async function fetchAccount(account) {
       pnl:      parseFloat(pos.unrealizedPnl || 0),
       liq:      pos.liquidationPx ? parseFloat(pos.liquidationPx) : null,
       leverage: pos.leverage ? pos.leverage.value : null,
-      leverageType: pos.leverage ? pos.leverage.type : 'cross',
-      marginUsed: parseFloat(pos.marginUsed || 0),
       roe:      pos.returnOnEquity != null ? parseFloat(pos.returnOnEquity) * 100 : null
     };
   }).filter(p => p.size !== 0);
@@ -469,6 +411,7 @@ async function fetchAccount(account) {
 
   const spotHoldings = [];
   let spotEquity = 0;
+  let usdcSpot = 0;
   if (spot && Array.isArray(spot.balances)) {
     spot.balances.forEach(b => {
       const total = parseFloat(b.total || 0);
@@ -476,6 +419,7 @@ async function fetchAccount(account) {
       const price = spotPrices[b.coin] ?? 0;
       const value = total * price;
       spotEquity += value;
+      if (b.coin === 'USDC') usdcSpot = total;
       spotHoldings.push({ coin: b.coin, amount: total, price, value });
     });
   }
@@ -483,25 +427,29 @@ async function fetchAccount(account) {
 
   const unrealizedPnl = positions.reduce((s,p) => s + p.pnl, 0);
 
-  const totalBalance = spotEquity;
-  const available    = Math.max(0, spotEquity - marginUsed);
+  // === NET PORTFOLIO ===
+  // Net = tutto ciò che possiedi valutato a mercato (spot + PnL non realizzato perps)
+  const netPortfolio = spotEquity + unrealizedPnl;
 
-  // Unified Account Ratio
-  const unifiedRatio = computeUnifiedRatio(perp, spot);
+  // Non investito = USDC spot libero (non bloccato come margine)
+  const nonInvestedSpot = Math.max(0, usdcSpot - marginUsed);
 
-  // Storico giornaliero (in parallelo, non blocca se fallisce)
-  const history = await fetchPortfolioHistory(user);
+  // Investito = tutto il resto (margine + token non-USDC + PnL)
+  const invested = netPortfolio - nonInvestedSpot;
 
   return {
     account,
     perpEquity, marginUsed,
     positions,
     spotEquity, spotHoldings,
-    totalBalance,
-    available,
-    unifiedRatio,
-    history,
-    unrealizedPnl
+    totalBalance: spotEquity,
+    available: nonInvestedSpot,
+    netPortfolio,
+    invested,
+    nonInvestedSpot,
+    unrealizedPnl,
+    riskRatio,
+    dailyPnl
   };
 }
 
@@ -515,11 +463,7 @@ async function refreshAll() {
 
   if (accounts.length === 0) {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:40px;">Nessun conto. Aggiungine uno qui sotto 👇</div>';
-    document.getElementById('gTotal').textContent     = '–';
-    document.getElementById('gAvailable').textContent = '–';
-    document.getElementById('gRatio').textContent     = '–';
-    document.getElementById('gPnl').textContent       = '–';
-    document.getElementById('gMargin').textContent    = '–';
+    ['gNet','gTotal','gAvailable','gPnl','gMargin','gRisk'].forEach(id => document.getElementById(id).textContent = '–');
     btn.disabled = false; btn.textContent = 'Aggiorna'; refreshing = false;
     return;
   }
@@ -559,77 +503,47 @@ function renderResults(results) {
   const grid = document.getElementById('accountsGrid');
   grid.innerHTML = '';
 
-  let totBalance = 0, totAvailable = 0, totPnl = 0, totMargin = 0;
-  let maxRatio = 0;
+  let totNet = 0, totBalance = 0, totAvailable = 0, totPnl = 0, totMargin = 0;
+  let riskSum = 0, riskCount = 0;
 
   results.forEach(r => {
     if (r.error) return;
+    totNet       += r.netPortfolio;
     totBalance   += r.totalBalance;
     totAvailable += r.available;
     totPnl       += r.unrealizedPnl;
     totMargin    += r.marginUsed;
-    if (r.unifiedRatio != null && r.unifiedRatio > maxRatio) {
-      maxRatio = r.unifiedRatio;
-    }
+    if (r.riskRatio > 0) { riskSum += r.riskRatio; riskCount++; }
   });
 
+  document.getElementById('gNet').textContent       = usd(totNet);
   document.getElementById('gTotal').textContent     = usd(totBalance);
   document.getElementById('gAvailable').textContent = usd(totAvailable);
   document.getElementById('gMargin').textContent    = usd(totMargin);
-
-  const ratioEl = document.getElementById('gRatio');
-  if (maxRatio > 0) {
-    const pct = (maxRatio * 100).toFixed(2) + '%';
-    ratioEl.textContent = pct;
-    ratioEl.className = 'value ' + (maxRatio < 0.5 ? 'green' : maxRatio < 0.8 ? 'yellow' : 'red');
-  } else {
-    ratioEl.textContent = '–';
-    ratioEl.className = 'value';
-  }
 
   const pnlEl = document.getElementById('gPnl');
   pnlEl.textContent = signedUsd(totPnl);
   pnlEl.className = 'value ' + (totPnl >= 0 ? 'green' : 'red');
 
+  const avgRisk = riskCount > 0 ? riskSum / riskCount : 0;
+  const riskEl = document.getElementById('gRisk');
+  riskEl.textContent = avgRisk.toFixed(2) + '%';
+  riskEl.className = 'value ' + riskClass(avgRisk);
+
   results.forEach(r => {
-    grid.appendChild(r.error ? renderErrorCard(r.account, r.error) : renderAccountCard(r, totBalance));
+    grid.appendChild(r.error ? renderErrorCard(r.account, r.error) : renderAccountCard(r, totNet));
   });
 }
 
-function renderHistoryChart(history) {
-  if (!history || !history.pnlHistory || history.pnlHistory.length === 0) {
-    return '<div class="empty">Storico non disponibile</div>';
-  }
-
-  const entries = history.pnlHistory;
-  const maxAbs = Math.max(...entries.map(e => Math.abs(e.pnl)), 1);
-  const totalPnl = entries.reduce((s, e) => s + e.pnl, 0);
-
-  // Mostra solo gli ultimi 14 giorni per non intasare
-  const recent = entries.slice(-14);
-
-  let barsHtml = '';
-  recent.forEach(e => {
-    const heightPct = Math.min(100, (Math.abs(e.pnl) / maxAbs) * 100);
-    const cls = e.pnl >= 0 ? 'pos' : 'neg';
-    const date = new Date(e.ts);
-    const dayLabel = date.getDate().toString();
-    barsHtml += `
-      <div class="bar-col" title="${signedUsd(e.pnl)}">
-        <div class="bar-fill ${cls}" style="height:${heightPct}%"></div>
-        <div class="bar-label">${dayLabel}</div>
-      </div>`;
-  });
-
-  const totalCls = totalPnl >= 0 ? 'green' : 'red';
-
-  return `
-    <div class="history-chart">${barsHtml}</div>
-    <div class="history-summary">
-      <span class="lbl">P&L ${history.period || ''}</span>
-      <span class="${totalCls}">${signedUsd(totalPnl)}</span>
-    </div>
-  `;
+function riskClass(ratio) {
+  if (ratio < 20) return 'green';
+  if (ratio < 50) return 'yellow';
+  return 'red';
+}
+function riskBadgeClass(ratio) {
+  if (ratio < 20) return 'low';
+  if (ratio < 50) return 'medium';
+  return 'high';
 }
 
 function renderAccountCard(data, grandTotal) {
@@ -638,34 +552,40 @@ function renderAccountCard(data, grandTotal) {
 
   const { account, perpEquity, marginUsed,
           positions, spotHoldings,
-          totalBalance, available, unifiedRatio, history, unrealizedPnl } = data;
+          totalBalance, available, netPortfolio, invested, nonInvestedSpot,
+          unrealizedPnl, riskRatio, dailyPnl } = data;
 
-  const sharePct = grandTotal > 0 ? (totalBalance / grandTotal) * 100 : 0;
+  const sharePct = grandTotal > 0 ? (netPortfolio / grandTotal) * 100 : 0;
 
+  // Barra margine/libero
   const totalForBar = marginUsed + available;
   const usedPct  = totalForBar > 0 ? (marginUsed / totalForBar) * 100 : 0;
   const freePct  = totalForBar > 0 ? (available  / totalForBar) * 100 : 0;
 
-  // Ratio
-  let ratioHtml = '';
-  if (unifiedRatio != null && unifiedRatio > 0) {
-    const pct = unifiedRatio * 100;
-    const cls = pct < 50 ? 'safe' : pct < 80 ? 'warning' : 'danger';
-    const label = pct < 50 ? 'Sano' : pct < 80 ? 'Attenzione' : 'Rischio';
-    ratioHtml = `
-      <div class="row">
-        <span class="k">Rischio (Unified Ratio)</span>
-        <span class="v ${cls === 'safe' ? 'green' : cls === 'warning' ? 'yellow' : 'red'}">${pct.toFixed(2)}% · ${label}</span>
-      </div>
-      <div class="ratio-bar"><div class="fill ${cls}" style="width:${Math.min(100, pct)}%"></div></div>
-    `;
-  } else {
-    ratioHtml = `
-      <div class="row">
-        <span class="k">Rischio (Unified Ratio)</span>
-        <span class="v muted">–</span>
-      </div>
-      <div class="ratio-bar"><div class="fill safe" style="width:0%"></div></div>
+  // Risk ratio bar (0-100%)
+  const riskPct = Math.min(100, riskRatio);
+  const riskCls = riskRatio < 20 ? '' : riskRatio < 50 ? 'medium' : 'high';
+
+  // === CHART P&L GIORNALIERO ===
+  let chartHtml = '<div class="empty">Storico non disponibile</div>';
+  if (dailyPnl && dailyPnl.length > 0) {
+    const maxAbs = Math.max(...dailyPnl.map(d => Math.abs(d.pnl)), 1);
+    const totalPeriod = dailyPnl.reduce((s, d) => s + d.pnl, 0);
+    const totalCls = totalPeriod >= 0 ? 'green' : 'red';
+
+    const bars = dailyPnl.map(d => {
+      const h = Math.max(2, (Math.abs(d.pnl) / maxAbs) * 100);
+      const cls = d.pnl > 0 ? 'pos' : d.pnl < 0 ? 'neg' : 'zero';
+      const dateShort = d.date.slice(5); // MM-DD
+      return `<div class="pnl-bar ${cls}" style="height:${h}%" title="${d.date}: ${signedUsd(d.pnl)}"></div>`;
+    }).join('');
+
+    const firstDay = dailyPnl[0].date.slice(5);
+    const lastDay  = dailyPnl[dailyPnl.length-1].date.slice(5);
+
+    chartHtml = `
+      <div class="pnl-chart">${bars}</div>
+      <div class="pnl-axis"><span>${firstDay}</span><span class="pnl-total ${totalCls}">7gg: ${signedUsd(totalPeriod)}</span><span>${lastDay}</span></div>
     `;
   }
 
@@ -679,7 +599,7 @@ function renderAccountCard(data, grandTotal) {
             <div class="pos-head">
               <span>${esc(p.coin)}
                 <span class="muted" style="font-weight:400;font-size:.72rem;">
-                  ${isLong?'LONG':'SHORT'}${p.leverage?' · '+p.leverage+'x':''}${p.leverageType === 'isolated' ? ' · iso' : ''}
+                  ${isLong?'LONG':'SHORT'}${p.leverage?' · '+p.leverage+'x':''}
                 </span>
               </span>
               <span class="${pnlClass}">${signedUsd(p.pnl)}</span>
@@ -714,34 +634,40 @@ function renderAccountCard(data, grandTotal) {
         <h3>${esc(account.name)}</h3>
         <div class="addr">${shortAddr(account.address)}</div>
       </div>
-      <button class="remove-btn" title="Rimuovi conto" data-remove="${account.id}">×</button>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="risk-badge ${riskBadgeClass(riskRatio)}" title="Unified Account Ratio: maintenance margin / account value">⚠ ${riskRatio.toFixed(2)}%</span>
+        <button class="remove-btn" title="Rimuovi conto" data-remove="${account.id}">×</button>
+      </div>
     </div>
 
     <div>
-      <div class="big-equity">${usd(totalBalance)}</div>
-      <div class="muted" style="font-size:.75rem;margin-top:2px;">Total Balance · ${sharePct.toFixed(1)}% del totale</div>
-      <div class="row" style="margin-top:10px;">
-        <span class="k">Available</span>
-        <span class="v">${usd(available)}</span>
-      </div>
+      <div class="big-label">Net Portfolio</div>
+      <div class="big-equity">${usd(netPortfolio)}</div>
+      <div class="muted" style="font-size:.75rem;margin-top:2px;">${sharePct.toFixed(1)}% del totale</div>
+    </div>
+
+    <div>
+      <div class="row"><span class="k">↳ Investito</span><span class="v">${usd(invested)}</span></div>
+      <div class="row"><span class="k">↳ Non investito (spot)</span><span class="v">${usd(nonInvestedSpot)}</span></div>
+      <div class="row" style="margin-top:6px;"><span class="k">Total Balance</span><span class="v">${usd(totalBalance)}</span></div>
+      <div class="row"><span class="k">Available</span><span class="v">${usd(available)}</span></div>
       <div class="bar">
         <div class="used" style="width:${usedPct}%"></div>
         <div class="free" style="width:${freePct}%"></div>
       </div>
-      <div class="hint">Margine usato ${usd(marginUsed)} · Disponibile ${usd(available)}</div>
+      <div class="hint">Margine usato ${usd(marginUsed)} · Libero ${usd(available)}</div>
     </div>
 
-    <div style="margin-top:6px;">
-      ${ratioHtml}
+    <div>
       <div class="row"><span class="k">PnL non realizzato</span><span class="v ${unrealizedPnl>=0?'green':'red'}">${signedUsd(unrealizedPnl)}</span></div>
-      <div class="row"><span class="k">Margine usato</span><span class="v">${usd(marginUsed)}</span></div>
-      <div class="row"><span class="k">Collaterale perps (equity)</span><span class="v">${usd(perpEquity)}</span></div>
+      <div class="row"><span class="k">Unified Account Ratio</span><span class="v ${riskClass(riskRatio)}">${riskRatio.toFixed(2)}%</span></div>
+      <div class="bar risk"><div class="r ${riskCls}" style="width:${riskPct}%"></div></div>
     </div>
 
     <div class="section-divider"></div>
     <div>
-      <div class="sub-title">Storico P&L giornaliero</div>
-      ${renderHistoryChart(history)}
+      <div class="sub-title">P&L Giornaliero (7gg)</div>
+      ${chartHtml}
     </div>
 
     <div class="section-divider"></div>
@@ -787,7 +713,7 @@ document.getElementById('accountsGrid').addEventListener('click', e => {
   if (btn) removeAccount(btn.getAttribute('data-remove'));
 });
 
-/* ============ LISTENER PULSANTI (safe) ============ */
+/* ============ LISTENER PULSANTI ============ */
 const _btnRefresh = document.getElementById('btnRefresh');
 if (_btnRefresh) _btnRefresh.addEventListener('click', refreshAll);
 
@@ -797,7 +723,6 @@ if (_btnAdd) _btnAdd.addEventListener('click', addAccount);
 const _chkAuto = document.getElementById('autoRefresh');
 if (_chkAuto) _chkAuto.addEventListener('change', toggleAuto);
 
-/* ============ AVVIO ============ */
 initAuth();
 </script>
 </body>
