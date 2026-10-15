@@ -560,7 +560,7 @@ async function refreshAll() {
   ));
 
   renderResults(results);
-  document.getElementById('lastUpdate').textContent = 'Ultimo: ' + new Date().toLocaleTimeString('it-IT');
+  document.getElementById('lastUpdate').textContent = 'Last: ' + new Date().toLocaleTimeString('it-IT');
 
   btn.disabled = false; btn.textContent = 'Refresh';
   refreshing = false;
