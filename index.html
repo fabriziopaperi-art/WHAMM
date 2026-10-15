@@ -716,15 +716,12 @@ function renderAccountCard(data, grandTotal) {
         </div>`).join('');
 
   card.innerHTML = `
-    <div class="card-header">
+        <div class="card-header">
       <div>
         <h3>${esc(account.name)}</h3>
         <div class="addr">${shortAddr(account.address)}</div>
       </div>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <span class="risk-badge ${riskBadgeClass(riskRatio)}" title="Unified Account Ratio (formula ufficiale Hyperliquid)">⚠ ${riskRatio.toFixed(2)}%</span>
-        <button class="remove-btn" title="Rimuovi conto" data-remove="${account.id}">×</button>
-      </div>
+      <button class="remove-btn" title="Rimuovi conto" data-remove="${account.id}">×</button>
     </div>
 
     <div>
@@ -746,10 +743,16 @@ function renderAccountCard(data, grandTotal) {
     </div>
 
     <div>
-      <div class="row"><span class="k">PnL non realizzato</span><span class="v ${unrealizedPnl>=0?'green':'red'}">${signedUsd(unrealizedPnl)}</span></div>
-      <div class="row"><span class="k">Margine manutenzione</span><span class="v">${usd(crossMaintenanceMargin)}</span></div>
-      <div class="row"><span class="k">Unified Account Ratio</span><span class="v ${riskClass(riskRatio)}">${riskRatio.toFixed(2)}% <span style="font-size:.75em;">${riskLabel(riskRatio)}</span></span></div>
+      <div class="row" style="margin-bottom:8px;">
+        <span class="k">Unified Account Ratio</span>
+        <span class="risk-badge ${riskBadgeClass(riskRatio)}" title="Formula ufficiale Hyperliquid">⚠ ${riskRatio.toFixed(2)}% · ${riskLabel(riskRatio)}</span>
+      </div>
       <div class="bar risk"><div class="r ${riskCls}" style="width:${riskPct}%"></div></div>
+      <div class="hint" style="margin-top:6px;">Margine manutenzione ${usd(crossMaintenanceMargin)}</div>
+      <div class="row" style="margin-top:10px;">
+        <span class="k">PnL non realizzato</span>
+        <span class="v ${unrealizedPnl>=0?'green':'red'}">${signedUsd(unrealizedPnl)}</span>
+      </div>
     </div>
 
     <div class="section-divider"></div>
