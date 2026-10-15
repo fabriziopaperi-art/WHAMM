@@ -44,10 +44,11 @@
   .toggle{display:flex; align-items:center; gap:6px; font-size:.85rem; color:var(--muted); cursor:pointer; user-select:none;}
   #lastUpdate{font-size:.8rem; color:var(--muted);}
 
-  .global-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:28px;}
-  .stat-box{background:linear-gradient(145deg,var(--card),var(--card2)); border:1px solid var(--border); border-radius:10px; padding:18px 20px;}
-  .stat-box .label{font-size:.7rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;}
-  .stat-box .value{font-size:1.5rem; font-weight:700; font-family:ui-monospace,Menlo,monospace;}
+  .global-stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:28px;}
+  .stat-box{background:linear-gradient(145deg,var(--card),var(--card2)); border:1px solid var(--border); border-radius:10px; padding:16px 18px;}
+  .stat-box .label{font-size:.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;}
+  .stat-box .value{font-size:1.4rem; font-weight:700; font-family:ui-monospace,Menlo,monospace;}
+  .stat-box .sublabel{font-size:.7rem; color:var(--muted); margin-top:2px;}
 
   .sect-title{font-size:1rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:1.5px; margin:0 0 16px;}
 
@@ -91,13 +92,11 @@
   .yellow{color:var(--yellow);}
   .muted{color:var(--muted);}
 
-  /* RISK BADGE */
   .risk-badge{display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:6px; font-size:.75rem; font-weight:600;}
   .risk-badge.low{background:rgba(63,185,80,.12); color:var(--green); border:1px solid rgba(63,185,80,.3);}
   .risk-badge.medium{background:rgba(210,153,34,.12); color:var(--yellow); border:1px solid rgba(210,153,34,.3);}
   .risk-badge.high{background:rgba(248,81,73,.12); color:var(--red); border:1px solid rgba(248,81,73,.3);}
 
-  /* P&L CHART */
   .pnl-chart{display:flex; align-items:flex-end; gap:3px; height:60px; margin-top:6px; padding:0 2px;}
   .pnl-bar{flex:1; min-height:2px; border-radius:2px 2px 0 0; transition:filter .15s; cursor:pointer; position:relative;}
   .pnl-bar:hover{filter:brightness(1.3);}
@@ -122,7 +121,7 @@
 
   @media (max-width:600px){
     body{padding:14px;}
-    .stat-box .value{font-size:1.2rem;}
+    .stat-box .value{font-size:1.15rem;}
     .big-equity{font-size:1.4rem;}
   }
 </style>
@@ -166,7 +165,8 @@
     <div class="stat-box"><div class="label">Available</div><div class="value" id="gAvailable">–</div></div>
     <div class="stat-box"><div class="label">PnL Non Realizzato</div><div class="value" id="gPnl">–</div></div>
     <div class="stat-box"><div class="label">Margine Usato</div><div class="value" id="gMargin">–</div></div>
-    <div class="stat-box"><div class="label">Rischio Medio</div><div class="value" id="gRisk">–</div></div>
+    <div class="stat-box"><div class="label">Rischio Medio</div><div class="value" id="gRiskAvg">–</div><div class="sublabel" id="gRiskAvgLabel"></div></div>
+    <div class="stat-box"><div class="label">Rischio Max</div><div class="value" id="gRiskMax">–</div><div class="sublabel" id="gRiskMaxLabel"></div></div>
   </div>
 
   <h2 class="sect-title">I tuoi conti</h2>
@@ -346,7 +346,6 @@ async function fetchDailyPnl(address) {
     const pnlHistory = weekEntry[1].pnlHistory || [];
     if (pnlHistory.length < 2) return null;
 
-    // Raggruppa per giorno (YYYY-MM-DD), tieni l'ultimo valore cumulativo del giorno
     const dayMap = {};
     pnlHistory.forEach(([ts, v]) => {
       const d = new Date(ts).toISOString().slice(0,10);
@@ -386,12 +385,7 @@ async function fetchAccount(account) {
   const ms         = (perp && perp.marginSummary) || {};
   const perpEquity = parseFloat(ms.accountValue    || 0);
   const marginUsed = parseFloat(ms.totalMarginUsed || 0);
-
-  // Risk ratio: maintenance margin / account value
-  const maintenanceMargin = parseFloat((perp && perp.crossMaintenanceMarginUsed) || 0);
-  // Per unified account usa il valore totale (spot + perps pnl); fallback su perpEquity
-  const accountValue = perpEquity || 0;
-  const riskRatio = accountValue > 0 ? (maintenanceMargin / accountValue) * 100 : 0;
+  const crossMaintenanceMargin = parseFloat((perp && perp.crossMaintenanceMarginUsed) || 0);
 
   const positions = ((perp && perp.assetPositions) || []).map(p => {
     const pos  = p.position || {};
@@ -404,7 +398,8 @@ async function fetchAccount(account) {
       pnl:      parseFloat(pos.unrealizedPnl || 0),
       liq:      pos.liquidationPx ? parseFloat(pos.liquidationPx) : null,
       leverage: pos.leverage ? pos.leverage.value : null,
-      roe:      pos.returnOnEquity != null ? parseFloat(pos.returnOnEquity) * 100 : null
+      roe:      pos.returnOnEquity != null ? parseFloat(pos.returnOnEquity) * 100 : null,
+      marginUsed: parseFloat(pos.marginUsed || 0)
     };
   }).filter(p => p.size !== 0);
   positions.sort((a,b) => Math.abs(b.value) - Math.abs(a.value));
@@ -428,18 +423,21 @@ async function fetchAccount(account) {
   const unrealizedPnl = positions.reduce((s,p) => s + p.pnl, 0);
 
   // === NET PORTFOLIO ===
-  // Net = tutto ciò che possiedi valutato a mercato (spot + PnL non realizzato perps)
   const netPortfolio = spotEquity + unrealizedPnl;
-
-  // Non investito = USDC spot libero (non bloccato come margine)
   const nonInvestedSpot = Math.max(0, usdcSpot - marginUsed);
-
-  // Investito = tutto il resto (margine + token non-USDC + PnL)
   const invested = netPortfolio - nonInvestedSpot;
+
+  // === UNIFIED ACCOUNT RATIO (formula ufficiale Hyperliquid) ===
+  // riskRatio = crossMaintenanceMarginUsed / (spotBalance - isolatedMargin)
+  // Fonte: https://hyperliquid.gitbook.io/Hyperliquid-docs/trading/account-abstraction-modes
+  const isolatedMargin = 0; // da estendere se si supportano posizioni isolated
+  const available = usdcSpot - isolatedMargin;
+  const riskRatio = available > 0 ? (crossMaintenanceMargin / available) * 100 : 0;
 
   return {
     account,
     perpEquity, marginUsed,
+    crossMaintenanceMargin,
     positions,
     spotEquity, spotHoldings,
     totalBalance: spotEquity,
@@ -463,7 +461,8 @@ async function refreshAll() {
 
   if (accounts.length === 0) {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:40px;">Nessun conto. Aggiungine uno qui sotto 👇</div>';
-    ['gNet','gTotal','gAvailable','gPnl','gMargin','gRisk'].forEach(id => document.getElementById(id).textContent = '–');
+    ['gNet','gTotal','gAvailable','gPnl','gMargin','gRiskAvg','gRiskMax'].forEach(id => document.getElementById(id).textContent = '–');
+    ['gRiskAvgLabel','gRiskMaxLabel'].forEach(id => document.getElementById(id).textContent = '');
     btn.disabled = false; btn.textContent = 'Aggiorna'; refreshing = false;
     return;
   }
@@ -504,7 +503,7 @@ function renderResults(results) {
   grid.innerHTML = '';
 
   let totNet = 0, totBalance = 0, totAvailable = 0, totPnl = 0, totMargin = 0;
-  let riskSum = 0, riskCount = 0;
+  const risks = [];
 
   results.forEach(r => {
     if (r.error) return;
@@ -513,7 +512,7 @@ function renderResults(results) {
     totAvailable += r.available;
     totPnl       += r.unrealizedPnl;
     totMargin    += r.marginUsed;
-    if (r.riskRatio > 0) { riskSum += r.riskRatio; riskCount++; }
+    risks.push(r.riskRatio);
   });
 
   document.getElementById('gNet').textContent       = usd(totNet);
@@ -525,10 +524,19 @@ function renderResults(results) {
   pnlEl.textContent = signedUsd(totPnl);
   pnlEl.className = 'value ' + (totPnl >= 0 ? 'green' : 'red');
 
-  const avgRisk = riskCount > 0 ? riskSum / riskCount : 0;
-  const riskEl = document.getElementById('gRisk');
-  riskEl.textContent = avgRisk.toFixed(2) + '%';
-  riskEl.className = 'value ' + riskClass(avgRisk);
+  // === RISCHIO MEDIO E MAX ===
+  const avgRisk = risks.length > 0 ? risks.reduce((s,x) => s+x, 0) / risks.length : 0;
+  const maxRisk = risks.length > 0 ? Math.max(...risks) : 0;
+
+  const avgEl = document.getElementById('gRiskAvg');
+  avgEl.textContent = avgRisk.toFixed(2) + '%';
+  avgEl.className = 'value ' + riskClass(avgRisk);
+  document.getElementById('gRiskAvgLabel').textContent = riskLabel(avgRisk);
+
+  const maxEl = document.getElementById('gRiskMax');
+  maxEl.textContent = maxRisk.toFixed(2) + '%';
+  maxEl.className = 'value ' + riskClass(maxRisk);
+  document.getElementById('gRiskMaxLabel').textContent = riskLabel(maxRisk);
 
   results.forEach(r => {
     grid.appendChild(r.error ? renderErrorCard(r.account, r.error) : renderAccountCard(r, totNet));
@@ -545,28 +553,30 @@ function riskBadgeClass(ratio) {
   if (ratio < 50) return 'medium';
   return 'high';
 }
+function riskLabel(ratio) {
+  if (ratio < 20) return '🟢 Basso';
+  if (ratio < 50) return '🟡 Medio';
+  return '🔴 Alto';
+}
 
 function renderAccountCard(data, grandTotal) {
   const card = document.createElement('div');
   card.className = 'card';
 
-  const { account, perpEquity, marginUsed,
+  const { account, perpEquity, marginUsed, crossMaintenanceMargin,
           positions, spotHoldings,
           totalBalance, available, netPortfolio, invested, nonInvestedSpot,
           unrealizedPnl, riskRatio, dailyPnl } = data;
 
   const sharePct = grandTotal > 0 ? (netPortfolio / grandTotal) * 100 : 0;
 
-  // Barra margine/libero
   const totalForBar = marginUsed + available;
   const usedPct  = totalForBar > 0 ? (marginUsed / totalForBar) * 100 : 0;
   const freePct  = totalForBar > 0 ? (available  / totalForBar) * 100 : 0;
 
-  // Risk ratio bar (0-100%)
   const riskPct = Math.min(100, riskRatio);
   const riskCls = riskRatio < 20 ? '' : riskRatio < 50 ? 'medium' : 'high';
 
-  // === CHART P&L GIORNALIERO ===
   let chartHtml = '<div class="empty">Storico non disponibile</div>';
   if (dailyPnl && dailyPnl.length > 0) {
     const maxAbs = Math.max(...dailyPnl.map(d => Math.abs(d.pnl)), 1);
@@ -576,7 +586,6 @@ function renderAccountCard(data, grandTotal) {
     const bars = dailyPnl.map(d => {
       const h = Math.max(2, (Math.abs(d.pnl) / maxAbs) * 100);
       const cls = d.pnl > 0 ? 'pos' : d.pnl < 0 ? 'neg' : 'zero';
-      const dateShort = d.date.slice(5); // MM-DD
       return `<div class="pnl-bar ${cls}" style="height:${h}%" title="${d.date}: ${signedUsd(d.pnl)}"></div>`;
     }).join('');
 
@@ -610,6 +619,7 @@ function renderAccountCard(data, grandTotal) {
               <span>Entry: <b>${p.entry ? fmtNum(p.entry) : '–'}</b></span>
               <span>Liq: <b>${p.liq ? fmtNum(p.liq) : '–'}</b></span>
               ${p.roe != null ? `<span>ROE: <b class="${p.roe>=0?'green':'red'}">${p.roe>=0?'+':''}${p.roe.toFixed(2)}%</b></span>` : ''}
+              ${p.marginUsed > 0 ? `<span>Margine: <b>${usd(p.marginUsed)}</b></span>` : ''}
             </div>
           </div>`;
       }).join('');
@@ -635,7 +645,7 @@ function renderAccountCard(data, grandTotal) {
         <div class="addr">${shortAddr(account.address)}</div>
       </div>
       <div style="display:flex; align-items:center; gap:8px;">
-        <span class="risk-badge ${riskBadgeClass(riskRatio)}" title="Unified Account Ratio: maintenance margin / account value">⚠ ${riskRatio.toFixed(2)}%</span>
+        <span class="risk-badge ${riskBadgeClass(riskRatio)}" title="Unified Account Ratio (formula ufficiale Hyperliquid)">⚠ ${riskRatio.toFixed(2)}%</span>
         <button class="remove-btn" title="Rimuovi conto" data-remove="${account.id}">×</button>
       </div>
     </div>
@@ -660,7 +670,8 @@ function renderAccountCard(data, grandTotal) {
 
     <div>
       <div class="row"><span class="k">PnL non realizzato</span><span class="v ${unrealizedPnl>=0?'green':'red'}">${signedUsd(unrealizedPnl)}</span></div>
-      <div class="row"><span class="k">Unified Account Ratio</span><span class="v ${riskClass(riskRatio)}">${riskRatio.toFixed(2)}%</span></div>
+      <div class="row"><span class="k">Margine manutenzione</span><span class="v">${usd(crossMaintenanceMargin)}</span></div>
+      <div class="row"><span class="k">Unified Account Ratio</span><span class="v ${riskClass(riskRatio)}">${riskRatio.toFixed(2)}% <span style="font-size:.75em;">${riskLabel(riskRatio)}</span></span></div>
       <div class="bar risk"><div class="r ${riskCls}" style="width:${riskPct}%"></div></div>
     </div>
 
