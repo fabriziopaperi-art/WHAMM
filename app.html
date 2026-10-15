@@ -243,7 +243,7 @@ async function initAuth() {
   supabase.auth.onAuthStateChange((_event, session) => handleSession(session));
 
   document.getElementById('googleBtn').addEventListener('click', () => {
-    supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } });
+    supabase.auth.signInWithOAuth({  provider: 'google', options: { redirectTo: window.location.origin + '/app.html' }
   });
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
