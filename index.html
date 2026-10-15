@@ -324,10 +324,10 @@ function updateNotifCard() {
   const desc = document.getElementById('notifDesc');
   if (notifSettings.enabled) {
     card.classList.add('on');
-    desc.textContent = `Attivo — riceverai una mail quando il rischio di un conto supera il ${notifSettings.threshold}%.`;
+    desc.textContent = `Active — you will receive an email when an account's risk exceeds the ${notifSettings.threshold}%.`;
   } else {
     card.classList.remove('on');
-    desc.textContent = 'Ricevi una mail quando il rischio di un conto supera la soglia.';
+    desc.textContent = 'Receive an email when the account risk exceeds the threshold.';
   }
 }
 
