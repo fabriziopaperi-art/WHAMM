@@ -149,7 +149,7 @@
     <div class="controls">
       <label class="toggle"><input type="checkbox" id="autoRefresh"> Auto 60s</label>
       <span id="lastUpdate"></span>
-      <button class="primary" id="btnRefresh">Aggiorna</button>
+      <button class="primary" id="btnRefresh">Refresh</button>
       <div class="user-chip">
         <img id="userAvatar" alt="">
         <span id="userEmail"></span>
@@ -540,20 +540,20 @@ async function refreshAll() {
 
   const btn  = document.getElementById('btnRefresh');
   const grid = document.getElementById('accountsGrid');
-  btn.disabled = true; btn.textContent = 'Aggiornamento...';
+  btn.disabled = true; btn.textContent = 'Refreshing...';
 
   if (accounts.length === 0) {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:40px;">Nessun conto. Aggiungine uno qui sotto 👇</div>';
     ['gNet','gTotal','gAvailable','gPnl','gMargin','gRiskAvg','gRiskMax'].forEach(id => document.getElementById(id).textContent = '–');
     ['gRiskAvgLabel','gRiskMaxLabel'].forEach(id => document.getElementById(id).textContent = '');
-    btn.disabled = false; btn.textContent = 'Aggiorna'; refreshing = false;
+    btn.disabled = false; btn.textContent = 'Refresh'; refreshing = false;
     return;
   }
 
   renderSkeletons(grid, accounts.length);
 
   try { spotPrices = await fetchSpotPrices(); }
-  catch(e) { console.warn('Prezzi spot non disponibili', e); spotPrices = { USDC: 1 }; }
+  catch(e) { console.warn('Spot prices not available', e); spotPrices = { USDC: 1 }; }
 
   const results = await Promise.all(accounts.map(a =>
     fetchAccount(a).catch(err => ({ error: err.message || String(err), account: a }))
@@ -562,7 +562,7 @@ async function refreshAll() {
   renderResults(results);
   document.getElementById('lastUpdate').textContent = 'Ultimo: ' + new Date().toLocaleTimeString('it-IT');
 
-  btn.disabled = false; btn.textContent = 'Aggiorna';
+  btn.disabled = false; btn.textContent = 'Refresh';
   refreshing = false;
 }
 
