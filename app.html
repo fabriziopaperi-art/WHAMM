@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wallet Hyperliquid Advanced Multiple Manager</title>
+<title>WHAMM - Hyperliquid Manager</title>
 <style>
   :root{
     --bg:#0d1117; --card:#161b22; --card2:#1c2128; --border:#30363d;
@@ -14,21 +14,59 @@
   *{box-sizing:border-box;}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:24px;min-height:100vh;}
   .container{max-width:1400px;margin:0 auto;}
+
+  /* LOGIN */
   .login-wrap{min-height:90vh;display:flex;align-items:center;justify-content:center;}
-  .login-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:40px;max-width:420px;width:100%;text-align:center;}
+  .login-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:40px;max-width:440px;width:100%;text-align:center;}
   .login-card h1{margin:0 0 8px;font-size:1.6rem;}
   .login-card p{color:var(--muted);font-size:.9rem;margin:0 0 28px;}
-  .gbtn{display:inline-flex;align-items:center;justify-content:center;gap:12px;background:#fff;color:#1f1f1f;border:none;border-radius:8px;padding:12px 20px;font-size:1rem;font-weight:600;cursor:pointer;width:100%;transition:filter .15s;}
-  .gbtn:hover{filter:brightness(.95);}
-  .gbtn svg{width:20px;height:20px;}
+  .login-card .btn-choice{
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    width:100%;padding:14px 20px;border:none;border-radius:8px;
+    font-size:1rem;font-weight:600;cursor:pointer;transition:filter .15s;
+    margin-bottom:12px;font-family:inherit;
+  }
+  .login-card .btn-choice:hover{filter:brightness(1.1);}
+  .login-card .btn-guest{background:var(--card2);color:var(--text);border:1px solid var(--border);}
+  .login-card .btn-guest:hover{background:var(--card);border-color:var(--muted);}
+  .login-card .btn-email{background:var(--blue);color:#0d1117;}
+  .login-card .divider{
+    display:flex;align-items:center;gap:12px;margin:20px 0;
+    color:var(--muted);font-size:.8rem;
+  }
+  .login-card .divider::before,.login-card .divider::after{
+    content:'';flex:1;height:1px;background:var(--border);
+  }
+  .login-card .email-form{margin-top:16px;text-align:left;display:none;}
+  .login-card .email-form.active{display:block;}
+  .login-card .email-form label{font-size:.75rem;color:var(--muted);display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px;}
+  .login-card .email-form input{
+    width:100%;padding:12px 14px;background:var(--bg);
+    border:1px solid var(--border);border-radius:8px;color:var(--text);
+    font-size:.95rem;font-family:inherit;margin-bottom:10px;
+  }
+  .login-card .email-form input:focus{outline:none;border-color:var(--blue);}
+  .login-card .email-form button{
+    width:100%;padding:12px;background:var(--blue);color:#0d1117;
+    border:none;border-radius:8px;font-weight:700;font-size:.95rem;cursor:pointer;
+    font-family:inherit;
+  }
+  .login-card .email-form button:hover{filter:brightness(1.1);}
+  .login-card .email-form button:disabled{opacity:.5;cursor:not-allowed;}
+  .login-card .message{padding:10px;border-radius:6px;font-size:.85rem;margin-top:12px;text-align:center;}
+  .login-card .message.success{background:rgba(63,185,80,.15);color:var(--green);border:1px solid rgba(63,185,80,.3);}
+  .login-card .message.error{background:rgba(248,81,73,.15);color:var(--red);border:1px solid rgba(248,81,73,.3);}
+
   header{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:24px;}
   h1{font-size:1.4rem;margin:0;font-weight:600;display:flex;align-items:center;gap:10px;}
   h1 .dot{width:10px;height:10px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 2s infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
-  .user-chip{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:6px 14px 6px 6px;font-size:.85rem;}
-  .user-chip img{width:28px;height:28px;border-radius:50%;}
+  .user-chip{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-size:.85rem;}
+  .user-chip .email{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .user-chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:0 4px;}
   .user-chip button:hover{color:var(--red);}
+  .user-chip .guest-badge{background:var(--yellow);color:#0d1117;padding:2px 8px;border-radius:4px;font-size:.7rem;font-weight:700;}
+
   .controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
   button.primary{background:var(--blue);color:#0d1117;border:none;border-radius:6px;padding:10px 16px;font-weight:600;font-size:.9rem;cursor:pointer;transition:all .15s;}
   button.primary:hover:not(:disabled){filter:brightness(1.1);}
@@ -36,9 +74,24 @@
   .toggle{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);cursor:pointer;user-select:none;}
   #lastUpdate{font-size:.8rem;color:var(--muted);}
 
-  /* NOTIFICHE CARD */
+  /* GUEST BANNER */
+  .guest-banner{
+    background:linear-gradient(145deg,var(--card),rgba(210,153,34,.08));
+    border:1px solid rgba(210,153,34,.4);
+    border-radius:10px;padding:14px 20px;margin-bottom:20px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  }
+  .guest-banner .text{flex:1;min-width:200px;font-size:.9rem;}
+  .guest-banner .text strong{color:var(--yellow);}
+  .guest-banner button{
+    background:var(--yellow);color:#0d1117;border:none;border-radius:6px;
+    padding:8px 16px;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;
+  }
+
+  /* NOTIFICHE */
   .notif-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;flex-wrap:wrap;align-items:center;gap:16px;}
   .notif-card.on{border-color:rgba(63,185,80,.4);background:linear-gradient(145deg,var(--card),rgba(63,185,80,.05));}
+  .notif-card.disabled{opacity:.5;pointer-events:none;}
   .notif-info{flex:1;min-width:220px;}
   .notif-info h3{margin:0 0 4px;font-size:.95rem;display:flex;align-items:center;gap:8px;}
   .notif-info p{margin:0;font-size:.78rem;color:var(--muted);}
@@ -47,8 +100,6 @@
   .notif-input label{font-size:.75rem;color:var(--muted);}
   .notif-input input{background:transparent;border:none;color:var(--text);font-family:inherit;font-size:.9rem;width:60px;text-align:right;outline:none;font-weight:600;}
   .notif-input span{font-size:.9rem;color:var(--muted);}
-
-  /* SWITCH */
   .switch{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0;}
   .switch input{opacity:0;width:0;height:0;}
   .switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--card2);border:1px solid var(--border);border-radius:26px;transition:.2s;}
@@ -113,7 +164,7 @@
   .add-account input:focus{outline:none;border-color:var(--blue);}
   .skeleton{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px;height:14px;}
   @keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px 20px;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);font-size:.9rem;z-index:1000;opacity:0;transition:opacity .2s;}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--border);color:var(--text);padding:12px 20px;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.5);font-size:.9rem;z-index:1000;opacity:0;transition:opacity .2s;max-width:90%;}
   .toast.show{opacity:1;}
   .toast.error{border-color:var(--red);}
   .hint{font-size:.7rem;color:var(--muted);font-style:italic;margin-top:-4px;}
@@ -127,50 +178,65 @@
 </head>
 <body>
 
+<!-- ===================== LOGIN ===================== -->
 <div id="loginView" class="login-wrap" style="display:none;">
   <div class="login-card">
-    <h1>Wallet Hyperliquid Advanced Multiple Manager</h1>
-    <p>Monitora Perps e Spot di più wallet in un'unica dashboard.</p>
-    <button class="gbtn" id="googleBtn">
-      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-        <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.2-.1-2.4-.4-3.5z"/>
-        <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
-        <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.7-3.1-11.3-8l-6.5 5C9.6 39.6 16.2 44 24 44z"/>
-        <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.1 5.6l6.2 5.2C36.9 39.2 44 34 44 24c0-1.2-.1-2.4-.4-3.5z"/>
-      </svg>
-      Accedi con Google
+    <h1>WHAMM</h1>
+    <p>Hyperliquid Portfolio Tracker</p>
+
+    <button class="btn-choice btn-email" id="showEmailBtn">
+      Accedi con Email
     </button>
+    <button class="btn-choice btn-guest" id="guestBtn">
+      Continua come Ospite
+    </button>
+
+    <div class="divider">oppure</div>
+
+    <div class="email-form" id="emailForm">
+      <label for="emailInput">La tua email</label>
+      <input type="email" id="emailInput" placeholder="tu@esempio.com" autocomplete="email">
+      <button id="sendMagicBtn">Invia link di accesso</button>
+      <div class="message" id="loginMessage" style="display:none;"></div>
+    </div>
   </div>
 </div>
 
+<!-- ===================== DASHBOARD ===================== -->
 <div id="dashboardView" class="container" style="display:none;">
   <header>
-    <h1><span class="dot"></span>Wallet Hyperliquid Advanced Multiple Manager</h1>
+    <h1><span class="dot"></span>WHAMM</h1>
     <div class="controls">
       <label class="toggle"><input type="checkbox" id="autoRefresh"> Auto 60s</label>
       <span id="lastUpdate"></span>
-      <button class="primary" id="btnRefresh">Refresh</button>
+      <button class="primary" id="btnRefresh">Aggiorna</button>
       <div class="user-chip">
-        <img id="userAvatar" alt="">
-        <span id="userEmail"></span>
+        <span id="userIdentity"></span>
         <button id="logoutBtn" title="Esci">⏻</button>
       </div>
     </div>
   </header>
 
-  <!-- NOTIFICHE -->
+  <div class="guest-banner" id="guestBanner" style="display:none;">
+    <div class="text">
+      <strong>Modalità Ospite</strong> — I tuoi conti sono salvati solo su questo browser.
+      Se cambi dispositivo o pulisci i dati del browser, li perdi.
+    </div>
+    <button id="upgradeBtn">Crea account</button>
+  </div>
+
   <div class="notif-card" id="notifCard">
     <div class="notif-info">
-      <h3>🔔 Liquidation Risk Email Warning</h3>
-      <p id="notifDesc">Receive an email when an account's risk exceeds the threshold.</p>
+      <h3>🔔 Avvisi email di rischio</h3>
+      <p id="notifDesc">Ricevi una mail quando il rischio di un conto supera la soglia.</p>
     </div>
     <div class="notif-controls">
       <div class="notif-input">
-        <label for="notifThreshold">threshold</label>
+        <label for="notifThreshold">Soglia</label>
         <input type="number" id="notifThreshold" min="1" max="100" step="1" value="50">
         <span>%</span>
       </div>
-      <label class="switch" title="Active/deactive notifications">
+      <label class="switch" title="Attiva/disattiva notifiche">
         <input type="checkbox" id="notifEnabled">
         <span class="slider"></span>
       </label>
@@ -181,19 +247,19 @@
     <div class="stat-box"><div class="label">Net Portfolio</div><div class="value" id="gNet">–</div></div>
     <div class="stat-box"><div class="label">Total Balance</div><div class="value" id="gTotal">–</div></div>
     <div class="stat-box"><div class="label">Available</div><div class="value" id="gAvailable">–</div></div>
-    <div class="stat-box"><div class="label">PnL Not Realized</div><div class="value" id="gPnl">–</div></div>
-    <div class="stat-box"><div class="label">Used Margin</div><div class="value" id="gMargin">–</div></div>
-    <div class="stat-box"><div class="label">RISK MID</div><div class="value" id="gRiskAvg">–</div><div class="sublabel" id="gRiskAvgLabel"></div></div>
-    <div class="stat-box"><div class="label">RISK MAX</div><div class="value" id="gRiskMax">–</div><div class="sublabel" id="gRiskMaxLabel"></div></div>
+    <div class="stat-box"><div class="label">PnL Non Realizzato</div><div class="value" id="gPnl">–</div></div>
+    <div class="stat-box"><div class="label">Margine Usato</div><div class="value" id="gMargin">–</div></div>
+    <div class="stat-box"><div class="label">Rischio Medio</div><div class="value" id="gRiskAvg">–</div><div class="sublabel" id="gRiskAvgLabel"></div></div>
+    <div class="stat-box"><div class="label">Rischio Max</div><div class="value" id="gRiskMax">–</div><div class="sublabel" id="gRiskMaxLabel"></div></div>
   </div>
 
-  <h2 class="sect-title">Your accounts</h2>
+  <h2 class="sect-title">I tuoi conti</h2>
   <div id="accountsGrid" class="grid"></div>
 
   <div class="add-account">
     <input type="text" id="newName" placeholder="Nome (es. MARIO)" maxlength="30">
     <input type="text" id="newAddress" placeholder="0x..." spellcheck="false">
-    <button class="primary" id="addAccountBtn">+ ADD ACCOUNT</button>
+    <button class="primary" id="addAccountBtn">+ Aggiungi conto</button>
   </div>
 </div>
 
@@ -209,13 +275,16 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const API_URL    = 'https://api.hyperliquid.xyz/info';
 const REFRESH_MS = 60_000;
+const GUEST_KEY  = 'whamm_guest_mode';
+const GUEST_ACC  = 'whamm_guest_accounts';
 
-let currentUser = null;
-let accounts    = [];
-let spotPrices  = { USDC: 1 };
-let refreshing  = false;
-let autoTimer   = null;
-let notifSettings = { enabled: false, threshold: 50 };
+let currentUser    = null;
+let isGuest        = false;
+let accounts       = [];
+let spotPrices     = { USDC: 1 };
+let refreshing     = false;
+let autoTimer      = null;
+let notifSettings  = { enabled: false, threshold: 50 };
 let notifSaveTimer = null;
 
 const usd = (n, dec=2) => (n==null||isNaN(n)) ? '–' : n.toLocaleString('it-IT',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + ' $';
@@ -237,50 +306,217 @@ function toast(msg, isError=false) {
   t._timeout = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
+/* ============ STORAGE ABSTRACTION ============ */
+const storage = {
+  async getAccounts() {
+    if (isGuest) {
+      try {
+        return JSON.parse(localStorage.getItem(GUEST_ACC) || '[]');
+      } catch(e) { return []; }
+    }
+    const { data, error } = await supabase
+      .from('tracked_accounts')
+      .select('id, name, address, created_at')
+      .order('created_at', { ascending: true });
+    if (error) throw error;
+    return data || [];
+  },
+
+  async addAccount(name, address) {
+    if (isGuest) {
+      const accs = JSON.parse(localStorage.getItem(GUEST_ACC) || '[]');
+      const newAcc = {
+        id: 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+        name, address, created_at: new Date().toISOString()
+      };
+      accs.push(newAcc);
+      localStorage.setItem(GUEST_ACC, JSON.stringify(accs));
+      return newAcc;
+    }
+    const { data, error } = await supabase
+      .from('tracked_accounts')
+      .insert({ user_id: currentUser.id, name, address })
+      .select('id, name, address, created_at')
+      .single();
+    if (error) throw error;
+    return data;
+  },
+
+  async removeAccount(id) {
+    if (isGuest) {
+      const accs = JSON.parse(localStorage.getItem(GUEST_ACC) || '[]');
+      localStorage.setItem(GUEST_ACC, JSON.stringify(accs.filter(a => a.id !== id)));
+      return;
+    }
+    const { error } = await supabase.from('tracked_accounts').delete().eq('id', id);
+    if (error) throw error;
+  },
+
+  async migrateToUser(userId) {
+    // Migra i conti guest su Supabase dopo il login
+    const accs = JSON.parse(localStorage.getItem(GUEST_ACC) || '[]');
+    if (accs.length === 0) return 0;
+    let migrated = 0;
+    for (const a of accs) {
+      try {
+        const { error } = await supabase.from('tracked_accounts')
+          .insert({ user_id: userId, name: a.name, address: a.address });
+        if (!error) migrated++;
+      } catch(e) { console.warn('Migrazione fallita per', a.name); }
+    }
+    localStorage.removeItem(GUEST_ACC);
+    return migrated;
+  }
+};
+
+/* ============ AUTH ============ */
 async function initAuth() {
   const { data: { session } } = await supabase.auth.getSession();
   handleSession(session);
-  supabase.auth.onAuthStateChange((_event, session) => handleSession(session));
 
-  document.getElementById('googleBtn').addEventListener('click', () => {
-    supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin + '/app.html' }
-    });
+  supabase.auth.onAuthStateChange((event, session) => {
+    handleSession(session);
+    // Quando l'utente fa login da magic link, se c'era roba guest, offri migrazione
+    if (event === 'SIGNED_IN' && session?.user) {
+      const guestAccs = JSON.parse(localStorage.getItem(GUEST_ACC) || '[]');
+      if (guestAccs.length > 0) {
+        setTimeout(async () => {
+          if (confirm(`Hai ${guestAccs.length} conti salvati come ospite. Vuoi importarli nel tuo account?`)) {
+            const n = await storage.migrateToUser(session.user.id);
+            toast(`${n} conti importati nel tuo account`);
+            loadAccounts();
+          }
+        }, 500);
+      }
+    }
   });
 
+  // Email form
+  document.getElementById('showEmailBtn').addEventListener('click', () => {
+    document.getElementById('emailForm').classList.toggle('active');
+    setTimeout(() => document.getElementById('emailInput').focus(), 100);
+  });
+
+  document.getElementById('sendMagicBtn').addEventListener('click', sendMagicLink);
+  document.getElementById('emailInput').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMagicLink();
+  });
+
+  // Guest button
+  document.getElementById('guestBtn').addEventListener('click', () => {
+    localStorage.setItem(GUEST_KEY, '1');
+    isGuest = true;
+    currentUser = null;
+    showDashboard();
+  });
+
+  // Logout
   document.getElementById('logoutBtn').addEventListener('click', async () => {
-    await supabase.auth.signOut();
+    if (isGuest) {
+      if (!confirm('Uscire dalla modalità ospite? I conti salvati localmente NON saranno cancellati.')) return;
+      localStorage.removeItem(GUEST_KEY);
+      location.reload();
+    } else {
+      await supabase.auth.signOut();
+      location.reload();
+    }
+  });
+
+  // Upgrade button (da guest a email)
+  document.getElementById('upgradeBtn').addEventListener('click', async () => {
+    if (!confirm('Vuoi creare un account per salvare i tuoi conti online? Verrai disconnesso dalla modalità ospite.')) return;
+    localStorage.removeItem(GUEST_KEY);
     location.reload();
   });
 }
 
-function handleSession(session) {
-  const loginView = document.getElementById('loginView');
-  const dashView  = document.getElementById('dashboardView');
+async function sendMagicLink() {
+  const email = document.getElementById('emailInput').value.trim();
+  const msgEl = document.getElementById('loginMessage');
+  const btn   = document.getElementById('sendMagicBtn');
 
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showLoginMessage('Inserisci un indirizzo email valido', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Invio in corso...';
+
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.origin + '/app.html' }
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Invia link di accesso';
+
+  if (error) {
+    showLoginMessage('Errore: ' + error.message, 'error');
+    return;
+  }
+
+  showLoginMessage('✉️ Controlla la tua email! Ti abbiamo inviato un link per accedere.', 'success');
+  document.getElementById('emailInput').value = '';
+}
+
+function showLoginMessage(text, type) {
+  const el = document.getElementById('loginMessage');
+  el.textContent = text;
+  el.className = 'message ' + type;
+  el.style.display = 'block';
+}
+
+function handleSession(session) {
   if (session?.user) {
     currentUser = session.user;
-    loginView.style.display = 'none';
-    dashView.style.display  = 'block';
-
-    const meta = currentUser.user_metadata || {};
-    document.getElementById('userEmail').textContent = currentUser.email || '';
-    const avatar = document.getElementById('userAvatar');
-    if (meta.avatar_url) { avatar.src = meta.avatar_url; avatar.style.display=''; }
-    else { avatar.style.display='none'; }
-
-    loadNotificationSettings();
-    loadAccountsFromDB();
+    isGuest = false;
+    localStorage.removeItem(GUEST_KEY);
+    showDashboard();
   } else {
-    currentUser = null;
-    loginView.style.display = 'flex';
-    dashView.style.display  = 'none';
+    // Controlla guest mode
+    if (localStorage.getItem(GUEST_KEY) === '1') {
+      isGuest = true;
+      currentUser = null;
+      showDashboard();
+    } else {
+      isGuest = false;
+      currentUser = null;
+      showLogin();
+    }
   }
+}
+
+function showLogin() {
+  document.getElementById('loginView').style.display = 'flex';
+  document.getElementById('dashboardView').style.display = 'none';
+}
+
+function showDashboard() {
+  document.getElementById('loginView').style.display = 'none';
+  document.getElementById('dashboardView').style.display = 'block';
+
+  // Identità utente
+  const idEl = document.getElementById('userIdentity');
+  if (isGuest) {
+    idEl.innerHTML = '<span class="guest-badge">OSPITE</span>';
+    document.getElementById('guestBanner').style.display = 'flex';
+    document.getElementById('notifCard').classList.add('disabled');
+    document.getElementById('notifDesc').textContent = 'Crea un account per ricevere avvisi email.';
+  } else {
+    idEl.innerHTML = `<span class="email">${esc(currentUser.email || '')}</span>`;
+    document.getElementById('guestBanner').style.display = 'none';
+    document.getElementById('notifCard').classList.remove('disabled');
+    loadNotificationSettings();
+  }
+
+  loadAccounts();
 }
 
 /* ============ NOTIFICHE ============ */
 async function loadNotificationSettings() {
+  if (isGuest || !currentUser) return;
+
   const { data, error } = await supabase
     .from('notification_settings')
     .select('enabled, threshold')
@@ -311,8 +547,8 @@ async function loadNotificationSettings() {
 
   thr.addEventListener('input', () => {
     let v = parseFloat(thr.value);
-    if (isNaN(v) || v < 1)   v = 1;
-    if (v > 100)             v = 100;
+    if (isNaN(v) || v < 1) v = 1;
+    if (v > 100) v = 100;
     notifSettings.threshold = v;
     scheduleSaveNotif();
   });
@@ -327,10 +563,10 @@ function updateNotifCard() {
   const desc = document.getElementById('notifDesc');
   if (notifSettings.enabled) {
     card.classList.add('on');
-    desc.textContent = `Active — you will receive an email when an account's risk exceeds the ${notifSettings.threshold}%.`;
+    desc.textContent = `Attivo — riceverai una mail quando il rischio supera il ${notifSettings.threshold}%.`;
   } else {
     card.classList.remove('on');
-    desc.textContent = 'Receive an email when the account risk exceeds the threshold.';
+    desc.textContent = 'Ricevi una mail quando il rischio supera la soglia.';
   }
 }
 
@@ -341,33 +577,21 @@ function scheduleSaveNotif() {
 }
 
 async function saveNotificationSettings() {
-  const payload = {
-    user_id:   currentUser.id,
-    enabled:   notifSettings.enabled,
-    threshold: notifSettings.threshold
-  };
-
-  const { error } = await supabase
-    .from('notification_settings')
-    .upsert(payload, { onConflict: 'user_id' });
-
-  if (error) {
-    toast('Errore salvataggio notifiche: ' + error.message, true);
-    return;
-  }
-  toast('Impostazioni notifiche salvate');
+  if (isGuest || !currentUser) return;
+  const payload = { user_id: currentUser.id, enabled: notifSettings.enabled, threshold: notifSettings.threshold };
+  const { error } = await supabase.from('notification_settings').upsert(payload, { onConflict: 'user_id' });
+  if (error) { toast('Errore salvataggio notifiche: ' + error.message, true); return; }
+  toast('Impostazioni salvate');
 }
 
 /* ============ CONTI ============ */
-async function loadAccountsFromDB() {
-  const { data, error } = await supabase
-    .from('tracked_accounts')
-    .select('id, name, address, created_at')
-    .order('created_at', { ascending: true });
-
-  if (error) { toast('Errore caricamento conti: ' + error.message, true); return; }
-  accounts = (data || []).map(r => ({ id: r.id, name: r.name, address: r.address }));
-  refreshAll();
+async function loadAccounts() {
+  try {
+    accounts = await storage.getAccounts();
+    refreshAll();
+  } catch(e) {
+    toast('Errore caricamento conti: ' + e.message, true);
+  }
 }
 
 async function addAccount() {
@@ -377,42 +601,39 @@ async function addAccount() {
   const addr   = addrEl.value.trim();
 
   if (!name || !addr)                return toast('Inserisci nome e indirizzo', true);
-  if (!/^0x[a-fA-F0-9]{40}$/.test(addr))
-    return toast('Indirizzo non valido (0x + 40 hex)', true);
+  if (!/^0x[a-fA-F0-9]{40}$/.test(addr)) return toast('Indirizzo non valido', true);
 
-  const { data, error } = await supabase
-    .from('tracked_accounts')
-    .insert({ user_id: currentUser.id, name, address: addr })
-    .select('id, name, address')
-    .single();
+  // Controllo duplicati locali
+  if (accounts.some(a => a.address.toLowerCase() === addr.toLowerCase()))
+    return toast('Indirizzo già presente', true);
 
-  if (error) {
-    if (error.code === '23505') return toast('Indirizzo già presente', true);
-    return toast('Errore: ' + error.message, true);
+  try {
+    const data = await storage.addAccount(name, addr);
+    accounts.push(data);
+    nameEl.value = ''; addrEl.value = '';
+    toast('Conto aggiunto');
+    refreshAll();
+  } catch(e) {
+    if (e.code === '23505') return toast('Indirizzo già presente', true);
+    toast('Errore: ' + e.message, true);
   }
-
-  accounts.push(data);
-  nameEl.value = ''; addrEl.value = '';
-  toast('Conto aggiunto');
-  refreshAll();
 }
 
 async function removeAccount(id) {
   if (!confirm('Rimuovere questo conto?')) return;
-  const { error } = await supabase.from('tracked_accounts').delete().eq('id', id);
-  if (error) return toast('Errore: ' + error.message, true);
-  accounts = accounts.filter(a => a.id !== id);
-  toast('Conto rimosso');
-  refreshAll();
+  try {
+    await storage.removeAccount(id);
+    accounts = accounts.filter(a => a.id !== id);
+    toast('Conto rimosso');
+    refreshAll();
+  } catch(e) {
+    toast('Errore: ' + e.message, true);
+  }
 }
 
 /* ============ HYPERLIQUID ============ */
 async function hlPost(body) {
-  const res = await fetch(API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
+  const res = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   if (!res.ok) throw new Error('HTTP ' + res.status);
   return res.json();
 }
@@ -421,20 +642,16 @@ async function fetchSpotPrices() {
   const data = await hlPost({ type: 'spotMetaAndAssetCtxs' });
   const prices = { USDC: 1 };
   if (!Array.isArray(data) || data.length < 2) return prices;
-
   const [meta, ctxs] = data;
-  const tokens   = meta.tokens   || [];
+  const tokens = meta.tokens || [];
   const universe = meta.universe || [];
   const tokenByIdx = {};
   tokens.forEach(t => { tokenByIdx[t.index] = t.name; });
-
   universe.forEach((pair, i) => {
     if (!pair || !pair.tokens) return;
     const name = tokenByIdx[pair.tokens[0]];
-    const ctx  = ctxs[i];
-    if (name && ctx && ctx.markPx && !(name in prices)) {
-      prices[name] = parseFloat(ctx.markPx);
-    }
+    const ctx = ctxs[i];
+    if (name && ctx && ctx.markPx && !(name in prices)) prices[name] = parseFloat(ctx.markPx);
   });
   return prices;
 }
@@ -447,64 +664,50 @@ async function fetchDailyPnl(address) {
     if (!weekEntry || !weekEntry[1]) return null;
     const pnlHistory = weekEntry[1].pnlHistory || [];
     if (pnlHistory.length < 2) return null;
-
     const dayMap = {};
-    pnlHistory.forEach(([ts, v]) => {
-      const d = new Date(ts).toISOString().slice(0,10);
-      dayMap[d] = parseFloat(v);
-    });
-
+    pnlHistory.forEach(([ts, v]) => { dayMap[new Date(ts).toISOString().slice(0,10)] = parseFloat(v); });
     const days = Object.keys(dayMap).sort();
     const result = [];
-    for (let i = 1; i < days.length; i++) {
-      result.push({ date: days[i], pnl: dayMap[days[i]] - dayMap[days[i-1]] });
-    }
+    for (let i = 1; i < days.length; i++) result.push({ date: days[i], pnl: dayMap[days[i]] - dayMap[days[i-1]] });
     return result;
-  } catch(e) {
-    console.warn('Portfolio fetch failed for', address, e);
-    return null;
-  }
+  } catch(e) { return null; }
 }
 
 async function fetchAccount(account) {
   const user = account.address.toLowerCase();
-
   const [perpRes, spotRes, pnlRes] = await Promise.allSettled([
-    hlPost({ type: 'clearinghouseState',     user }),
+    hlPost({ type: 'clearinghouseState', user }),
     hlPost({ type: 'spotClearinghouseState', user }),
     fetchDailyPnl(user)
   ]);
-
   const perp = perpRes.status === 'fulfilled' ? perpRes.value : null;
   const spot = spotRes.status === 'fulfilled' ? spotRes.value : null;
   const dailyPnl = pnlRes.status === 'fulfilled' ? pnlRes.value : null;
-
   if (!perp && !spot) throw new Error('Nessun dato disponibile');
 
-  const ms         = (perp && perp.marginSummary) || {};
-  const perpEquity = parseFloat(ms.accountValue    || 0);
+  const ms = (perp && perp.marginSummary) || {};
+  const perpEquity = parseFloat(ms.accountValue || 0);
   const marginUsed = parseFloat(ms.totalMarginUsed || 0);
   const crossMaintenanceMargin = parseFloat((perp && perp.crossMaintenanceMarginUsed) || 0);
 
   const positions = ((perp && perp.assetPositions) || []).map(p => {
-    const pos  = p.position || {};
+    const pos = p.position || {};
     const size = parseFloat(pos.szi || 0);
     return {
       coin: pos.coin, size,
-      entry:    parseFloat(pos.entryPx || 0) || null,
-      value:    parseFloat(pos.positionValue || 0),
-      pnl:      parseFloat(pos.unrealizedPnl || 0),
-      liq:      pos.liquidationPx ? parseFloat(pos.liquidationPx) : null,
+      entry: parseFloat(pos.entryPx || 0) || null,
+      value: parseFloat(pos.positionValue || 0),
+      pnl: parseFloat(pos.unrealizedPnl || 0),
+      liq: pos.liquidationPx ? parseFloat(pos.liquidationPx) : null,
       leverage: pos.leverage ? pos.leverage.value : null,
-      roe:      pos.returnOnEquity != null ? parseFloat(pos.returnOnEquity) * 100 : null,
+      roe: pos.returnOnEquity != null ? parseFloat(pos.returnOnEquity) * 100 : null,
       marginUsed: parseFloat(pos.marginUsed || 0)
     };
   }).filter(p => p.size !== 0);
   positions.sort((a,b) => Math.abs(b.value) - Math.abs(a.value));
 
   const spotHoldings = [];
-  let spotEquity = 0;
-  let usdcSpot = 0;
+  let spotEquity = 0, usdcSpot = 0;
   if (spot && Array.isArray(spot.balances)) {
     spot.balances.forEach(b => {
       const total = parseFloat(b.total || 0);
@@ -522,50 +725,49 @@ async function fetchAccount(account) {
   const netPortfolio = spotEquity + unrealizedPnl;
   const nonInvestedSpot = Math.max(0, usdcSpot - marginUsed);
   const invested = netPortfolio - nonInvestedSpot;
-
-  const isolatedMargin = 0;
-  const available = usdcSpot - isolatedMargin;
+  const available = usdcSpot;
   const riskRatio = available > 0 ? (crossMaintenanceMargin / available) * 100 : 0;
 
   return {
     account, perpEquity, marginUsed, crossMaintenanceMargin,
     positions, spotEquity, spotHoldings,
-    totalBalance: spotEquity,
-    available: nonInvestedSpot,
+    totalBalance: spotEquity, available: nonInvestedSpot,
     netPortfolio, invested, nonInvestedSpot,
     unrealizedPnl, riskRatio, dailyPnl
   };
 }
 
 async function refreshAll() {
-  if (refreshing || !currentUser) return;
+  if (refreshing) return;
   refreshing = true;
 
   const btn  = document.getElementById('btnRefresh');
   const grid = document.getElementById('accountsGrid');
-  btn.disabled = true; btn.textContent = 'Refreshing...';
+  if (!btn || !grid) { refreshing = false; return; }
+
+  btn.disabled = true; btn.textContent = 'Aggiornamento...';
 
   if (accounts.length === 0) {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:40px;">Nessun conto. Aggiungine uno qui sotto 👇</div>';
     ['gNet','gTotal','gAvailable','gPnl','gMargin','gRiskAvg','gRiskMax'].forEach(id => document.getElementById(id).textContent = '–');
     ['gRiskAvgLabel','gRiskMaxLabel'].forEach(id => document.getElementById(id).textContent = '');
-    btn.disabled = false; btn.textContent = 'Refresh'; refreshing = false;
+    btn.disabled = false; btn.textContent = 'Aggiorna'; refreshing = false;
     return;
   }
 
   renderSkeletons(grid, accounts.length);
 
   try { spotPrices = await fetchSpotPrices(); }
-  catch(e) { console.warn('Spot prices not available', e); spotPrices = { USDC: 1 }; }
+  catch(e) { spotPrices = { USDC: 1 }; }
 
   const results = await Promise.all(accounts.map(a =>
     fetchAccount(a).catch(err => ({ error: err.message || String(err), account: a }))
   ));
 
   renderResults(results);
-  document.getElementById('lastUpdate').textContent = 'Last: ' + new Date().toLocaleTimeString('it-IT');
+  document.getElementById('lastUpdate').textContent = 'Ultimo: ' + new Date().toLocaleTimeString('it-IT');
 
-  btn.disabled = false; btn.textContent = 'Refresh';
+  btn.disabled = false; btn.textContent = 'Aggiorna';
   refreshing = false;
 }
 
@@ -578,7 +780,6 @@ function renderSkeletons(grid, n) {
       <div class="skeleton" style="width:50%;height:18px;"></div>
       <div class="skeleton" style="width:80%;height:26px;"></div>
       <div class="skeleton" style="width:100%;"></div>
-      <div class="skeleton" style="width:100%;"></div>
       <div class="skeleton" style="width:100%;"></div>`;
     grid.appendChild(c);
   }
@@ -587,24 +788,19 @@ function renderSkeletons(grid, n) {
 function renderResults(results) {
   const grid = document.getElementById('accountsGrid');
   grid.innerHTML = '';
-
   let totNet = 0, totBalance = 0, totAvailable = 0, totPnl = 0, totMargin = 0;
   const risks = [];
 
   results.forEach(r => {
     if (r.error) return;
-    totNet       += r.netPortfolio;
-    totBalance   += r.totalBalance;
-    totAvailable += r.available;
-    totPnl       += r.unrealizedPnl;
-    totMargin    += r.marginUsed;
-    risks.push(r.riskRatio);
+    totNet += r.netPortfolio; totBalance += r.totalBalance; totAvailable += r.available;
+    totPnl += r.unrealizedPnl; totMargin += r.marginUsed; risks.push(r.riskRatio);
   });
 
-  document.getElementById('gNet').textContent       = usd(totNet);
-  document.getElementById('gTotal').textContent     = usd(totBalance);
+  document.getElementById('gNet').textContent = usd(totNet);
+  document.getElementById('gTotal').textContent = usd(totBalance);
   document.getElementById('gAvailable').textContent = usd(totAvailable);
-  document.getElementById('gMargin').textContent    = usd(totMargin);
+  document.getElementById('gMargin').textContent = usd(totMargin);
 
   const pnlEl = document.getElementById('gPnl');
   pnlEl.textContent = signedUsd(totPnl);
@@ -623,40 +819,24 @@ function renderResults(results) {
   maxEl.className = 'value ' + riskClass(maxRisk);
   document.getElementById('gRiskMaxLabel').textContent = riskLabel(maxRisk);
 
-  results.forEach(r => {
-    grid.appendChild(r.error ? renderErrorCard(r.account, r.error) : renderAccountCard(r, totNet));
-  });
+  results.forEach(r => grid.appendChild(r.error ? renderErrorCard(r.account, r.error) : renderAccountCard(r, totNet)));
 }
 
-function riskClass(ratio) {
-  if (ratio < 20) return 'green';
-  if (ratio < 50) return 'yellow';
-  return 'red';
-}
-function riskBadgeClass(ratio) {
-  if (ratio < 20) return 'low';
-  if (ratio < 50) return 'medium';
-  return 'high';
-}
-function riskLabel(ratio) {
-  if (ratio < 20) return '🟢 Basso';
-  if (ratio < 50) return '🟡 Medio';
-  return '🔴 Alto';
-}
+function riskClass(ratio) { return ratio < 20 ? 'green' : ratio < 50 ? 'yellow' : 'red'; }
+function riskBadgeClass(ratio) { return ratio < 20 ? 'low' : ratio < 50 ? 'medium' : 'high'; }
+function riskLabel(ratio) { return ratio < 20 ? '🟢 Basso' : ratio < 50 ? '🟡 Medio' : '🔴 Alto'; }
 
 function renderAccountCard(data, grandTotal) {
   const card = document.createElement('div');
   card.className = 'card';
-
-  const { account, perpEquity, marginUsed, crossMaintenanceMargin,
-          positions, spotHoldings,
+  const { account, marginUsed, crossMaintenanceMargin, positions, spotHoldings,
           totalBalance, available, netPortfolio, invested, nonInvestedSpot,
           unrealizedPnl, riskRatio, dailyPnl } = data;
 
   const sharePct = grandTotal > 0 ? (netPortfolio / grandTotal) * 100 : 0;
   const totalForBar = marginUsed + available;
-  const usedPct  = totalForBar > 0 ? (marginUsed / totalForBar) * 100 : 0;
-  const freePct  = totalForBar > 0 ? (available  / totalForBar) * 100 : 0;
+  const usedPct = totalForBar > 0 ? (marginUsed / totalForBar) * 100 : 0;
+  const freePct = totalForBar > 0 ? (available / totalForBar) * 100 : 0;
   const riskPct = Math.min(100, riskRatio);
   const riskCls = riskRatio < 20 ? '' : riskRatio < 50 ? 'medium' : 'high';
 
@@ -671,60 +851,42 @@ function renderAccountCard(data, grandTotal) {
       return `<div class="pnl-bar ${cls}" style="height:${h}%" title="${d.date}: ${signedUsd(d.pnl)}"></div>`;
     }).join('');
     const firstDay = dailyPnl[0].date.slice(5);
-    const lastDay  = dailyPnl[dailyPnl.length-1].date.slice(5);
-    chartHtml = `
-      <div class="pnl-chart">${bars}</div>
-      <div class="pnl-axis"><span>${firstDay}</span><span class="pnl-total ${totalCls}">7gg: ${signedUsd(totalPeriod)}</span><span>${lastDay}</span></div>
-    `;
+    const lastDay = dailyPnl[dailyPnl.length-1].date.slice(5);
+    chartHtml = `<div class="pnl-chart">${bars}</div>
+      <div class="pnl-axis"><span>${firstDay}</span><span class="pnl-total ${totalCls}">7gg: ${signedUsd(totalPeriod)}</span><span>${lastDay}</span></div>`;
   }
 
-  let posHtml = positions.length === 0
-    ? '<div class="empty">Nessuna posizione aperta</div>'
+  const posHtml = positions.length === 0
+    ? '<div class="empty">Nessuna posizione</div>'
     : positions.map(p => {
-        const isLong   = p.size > 0;
+        const isLong = p.size > 0;
         const pnlClass = p.pnl >= 0 ? 'green' : 'red';
-        return `
-          <div class="position ${isLong ? 'long' : 'short'}">
-            <div class="pos-head">
-              <span>${esc(p.coin)}
-                <span class="muted" style="font-weight:400;font-size:.72rem;">
-                  ${isLong?'LONG':'SHORT'}${p.leverage?' · '+p.leverage+'x':''}
-                </span>
-              </span>
-              <span class="${pnlClass}">${signedUsd(p.pnl)}</span>
-            </div>
-            <div class="pos-details">
-              <span>Size: <b>${fmtNum(Math.abs(p.size))}</b></span>
-              <span>Valore: <b>${usd(Math.abs(p.value))}</b></span>
-              <span>Entry: <b>${p.entry ? fmtNum(p.entry) : '–'}</b></span>
-              <span>Liq: <b>${p.liq ? fmtNum(p.liq) : '–'}</b></span>
-              ${p.roe != null ? `<span>ROE: <b class="${p.roe>=0?'green':'red'}">${p.roe>=0?'+':''}${p.roe.toFixed(2)}%</b></span>` : ''}
-              ${p.marginUsed > 0 ? `<span>Margine: <b>${usd(p.marginUsed)}</b></span>` : ''}
-            </div>
-          </div>`;
-      }).join('');
-
-  let spotHtml = spotHoldings.length === 0
-    ? '<div class="empty">Nessun saldo spot</div>'
-    : spotHoldings.map(s => `
-        <div class="position spot">
+        return `<div class="position ${isLong ? 'long' : 'short'}">
           <div class="pos-head">
-            <span>${esc(s.coin)}</span>
-            <span>${usd(s.value)}</span>
+            <span>${esc(p.coin)} <span class="muted" style="font-weight:400;font-size:.72rem;">${isLong?'LONG':'SHORT'}${p.leverage?' · '+p.leverage+'x':''}</span></span>
+            <span class="${pnlClass}">${signedUsd(p.pnl)}</span>
           </div>
           <div class="pos-details">
-            <span>Q.tà: <b>${fmtNum(s.amount)}</b></span>
-            <span>Prezzo: <b>${s.price ? fmtNum(s.price) : '–'}</b></span>
+            <span>Size: <b>${fmtNum(Math.abs(p.size))}</b></span>
+            <span>Valore: <b>${usd(Math.abs(p.value))}</b></span>
+            <span>Entry: <b>${p.entry ? fmtNum(p.entry) : '–'}</b></span>
+            <span>Liq: <b>${p.liq ? fmtNum(p.liq) : '–'}</b></span>
+            ${p.roe != null ? `<span>ROE: <b class="${p.roe>=0?'green':'red'}">${p.roe>=0?'+':''}${p.roe.toFixed(2)}%</b></span>` : ''}
           </div>
-        </div>`).join('');
+        </div>`;
+      }).join('');
+
+  const spotHtml = spotHoldings.length === 0
+    ? '<div class="empty">Nessun saldo spot</div>'
+    : spotHoldings.map(s => `<div class="position spot">
+        <div class="pos-head"><span>${esc(s.coin)}</span><span>${usd(s.value)}</span></div>
+        <div class="pos-details"><span>Q.tà: <b>${fmtNum(s.amount)}</b></span><span>Prezzo: <b>${s.price ? fmtNum(s.price) : '–'}</b></span></div>
+      </div>`).join('');
 
   card.innerHTML = `
-        <div class="card-header">
-      <div>
-        <h3>${esc(account.name)}</h3>
-        <div class="addr">${shortAddr(account.address)}</div>
-      </div>
-      <button class="remove-btn" title="Rimuovi conto" data-remove="${account.id}">×</button>
+    <div class="card-header">
+      <div><h3>${esc(account.name)}</h3><div class="addr">${shortAddr(account.address)}</div></div>
+      <button class="remove-btn" title="Rimuovi" data-remove="${account.id}">×</button>
     </div>
 
     <div>
@@ -735,20 +897,17 @@ function renderAccountCard(data, grandTotal) {
 
     <div>
       <div class="row"><span class="k">↳ Investito</span><span class="v">${usd(invested)}</span></div>
-      <div class="row"><span class="k">↳ Non investito (spot)</span><span class="v">${usd(nonInvestedSpot)}</span></div>
+      <div class="row"><span class="k">↳ Non investito</span><span class="v">${usd(nonInvestedSpot)}</span></div>
       <div class="row" style="margin-top:6px;"><span class="k">Total Balance</span><span class="v">${usd(totalBalance)}</span></div>
       <div class="row"><span class="k">Available</span><span class="v">${usd(available)}</span></div>
-      <div class="bar">
-        <div class="used" style="width:${usedPct}%"></div>
-        <div class="free" style="width:${freePct}%"></div>
-      </div>
+      <div class="bar"><div class="used" style="width:${usedPct}%"></div><div class="free" style="width:${freePct}%"></div></div>
       <div class="hint">Margine usato ${usd(marginUsed)} · Libero ${usd(available)}</div>
     </div>
 
     <div>
       <div class="row" style="margin-bottom:8px;">
         <span class="k">Unified Account Ratio</span>
-        <span class="risk-badge ${riskBadgeClass(riskRatio)}" title="Formula ufficiale Hyperliquid">⚠ ${riskRatio.toFixed(2)}% · ${riskLabel(riskRatio)}</span>
+        <span class="risk-badge ${riskBadgeClass(riskRatio)}">⚠ ${riskRatio.toFixed(2)}% · ${riskLabel(riskRatio)}</span>
       </div>
       <div class="bar risk"><div class="r ${riskCls}" style="width:${riskPct}%"></div></div>
       <div class="hint" style="margin-top:6px;">Margine manutenzione ${usd(crossMaintenanceMargin)}</div>
@@ -759,24 +918,12 @@ function renderAccountCard(data, grandTotal) {
     </div>
 
     <div class="section-divider"></div>
-    <div>
-      <div class="sub-title">P&L Giornaliero (7gg)</div>
-      ${chartHtml}
-    </div>
-
+    <div><div class="sub-title">P&L Giornaliero (7gg)</div>${chartHtml}</div>
     <div class="section-divider"></div>
-    <div>
-      <div class="sub-title">Posizioni Perps (${positions.length})</div>
-      ${posHtml}
-    </div>
-
+    <div><div class="sub-title">Posizioni Perps (${positions.length})</div>${posHtml}</div>
     <div class="section-divider"></div>
-    <div>
-      <div class="sub-title">Saldo Spot (${spotHoldings.length})</div>
-      ${spotHtml}
-    </div>
+    <div><div class="sub-title">Saldo Spot (${spotHoldings.length})</div>${spotHtml}</div>
   `;
-
   return card;
 }
 
@@ -785,10 +932,7 @@ function renderErrorCard(account, err) {
   c.className = 'card error';
   c.innerHTML = `
     <div class="card-header">
-      <div>
-        <h3>${esc(account.name)}</h3>
-        <div class="addr">${shortAddr(account.address)}</div>
-      </div>
+      <div><h3>${esc(account.name)}</h3><div class="addr">${shortAddr(account.address)}</div></div>
       <button class="remove-btn" data-remove="${account.id}">×</button>
     </div>
     <div class="red" style="font-weight:600;">Dati non disponibili</div>
@@ -820,4 +964,3 @@ initAuth();
 </script>
 </body>
 </html>
-
