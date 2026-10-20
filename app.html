@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -88,7 +88,7 @@
     padding:8px 16px;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;
   }
 
-  /* NOTIFICHE */
+  /* NOTIFICATIONS */
   .notif-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;flex-wrap:wrap;align-items:center;gap:16px;}
   .notif-card.on{border-color:rgba(63,185,80,.4);background:linear-gradient(145deg,var(--card),rgba(63,185,80,.05));}
   .notif-card.disabled{opacity:.5;pointer-events:none;}
@@ -185,18 +185,18 @@
     <p>Hyperliquid Portfolio Tracker</p>
 
     <button class="btn-choice btn-email" id="showEmailBtn">
-      Accedi con Email
+      Sign in with Email
     </button>
     <button class="btn-choice btn-guest" id="guestBtn">
-      Continua come Ospite
+      Continue as Guest
     </button>
 
-    <div class="divider">oppure</div>
+    <div class="divider">or</div>
 
     <div class="email-form" id="emailForm">
-      <label for="emailInput">La tua email</label>
-      <input type="email" id="emailInput" placeholder="tu@esempio.com" autocomplete="email">
-      <button id="sendMagicBtn">Invia link di accesso</button>
+      <label for="emailInput">Your email</label>
+      <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email">
+      <button id="sendMagicBtn">Send magic link</button>
       <div class="message" id="loginMessage" style="display:none;"></div>
     </div>
   </div>
@@ -209,34 +209,34 @@
     <div class="controls">
       <label class="toggle"><input type="checkbox" id="autoRefresh"> Auto 60s</label>
       <span id="lastUpdate"></span>
-      <button class="primary" id="btnRefresh">Aggiorna</button>
+      <button class="primary" id="btnRefresh">Refresh</button>
       <div class="user-chip">
         <span id="userIdentity"></span>
-        <button id="logoutBtn" title="Esci">⏻</button>
+        <button id="logoutBtn" title="Logout">⏻</button>
       </div>
     </div>
   </header>
 
   <div class="guest-banner" id="guestBanner" style="display:none;">
     <div class="text">
-      <strong>Modalità Ospite</strong> — I tuoi conti sono salvati solo su questo browser.
-      Se cambi dispositivo o pulisci i dati del browser, li perdi.
+      <strong>Guest Mode</strong> — Your accounts are saved only in this browser.
+      If you switch devices or clear browser data, they will be lost.
     </div>
-    <button id="upgradeBtn">Crea account</button>
+    <button id="upgradeBtn">Create account</button>
   </div>
 
   <div class="notif-card" id="notifCard">
     <div class="notif-info">
-      <h3>🔔 Avvisi email di rischio</h3>
-      <p id="notifDesc">Ricevi una mail quando il rischio di un conto supera la soglia.</p>
+      <h3>🔔 Liquidation Risk Email Alerts</h3>
+      <p id="notifDesc">Receive an email when an account's risk exceeds the threshold.</p>
     </div>
     <div class="notif-controls">
       <div class="notif-input">
-        <label for="notifThreshold">Soglia</label>
+        <label for="notifThreshold">Threshold</label>
         <input type="number" id="notifThreshold" min="1" max="100" step="1" value="50">
         <span>%</span>
       </div>
-      <label class="switch" title="Attiva/disattiva notifiche">
+      <label class="switch" title="Enable/disable notifications">
         <input type="checkbox" id="notifEnabled">
         <span class="slider"></span>
       </label>
@@ -247,19 +247,19 @@
     <div class="stat-box"><div class="label">Net Portfolio</div><div class="value" id="gNet">–</div></div>
     <div class="stat-box"><div class="label">Total Balance</div><div class="value" id="gTotal">–</div></div>
     <div class="stat-box"><div class="label">Available</div><div class="value" id="gAvailable">–</div></div>
-    <div class="stat-box"><div class="label">PnL Non Realizzato</div><div class="value" id="gPnl">–</div></div>
-    <div class="stat-box"><div class="label">Margine Usato</div><div class="value" id="gMargin">–</div></div>
-    <div class="stat-box"><div class="label">Rischio Medio</div><div class="value" id="gRiskAvg">–</div><div class="sublabel" id="gRiskAvgLabel"></div></div>
-    <div class="stat-box"><div class="label">Rischio Max</div><div class="value" id="gRiskMax">–</div><div class="sublabel" id="gRiskMaxLabel"></div></div>
+    <div class="stat-box"><div class="label">Unrealized PnL</div><div class="value" id="gPnl">–</div></div>
+    <div class="stat-box"><div class="label">Used Margin</div><div class="value" id="gMargin">–</div></div>
+    <div class="stat-box"><div class="label">Avg Risk</div><div class="value" id="gRiskAvg">–</div><div class="sublabel" id="gRiskAvgLabel"></div></div>
+    <div class="stat-box"><div class="label">Max Risk</div><div class="value" id="gRiskMax">–</div><div class="sublabel" id="gRiskMaxLabel"></div></div>
   </div>
 
-  <h2 class="sect-title">I tuoi conti</h2>
+  <h2 class="sect-title">Your accounts</h2>
   <div id="accountsGrid" class="grid"></div>
 
   <div class="add-account">
-    <input type="text" id="newName" placeholder="Nome (es. MARIO)" maxlength="30">
+    <input type="text" id="newName" placeholder="Name (e.g. MARIO)" maxlength="30">
     <input type="text" id="newAddress" placeholder="0x..." spellcheck="false">
-    <button class="primary" id="addAccountBtn">+ Aggiungi conto</button>
+    <button class="primary" id="addAccountBtn">+ Add account</button>
   </div>
 </div>
 
@@ -287,13 +287,13 @@ let autoTimer      = null;
 let notifSettings  = { enabled: false, threshold: 50 };
 let notifSaveTimer = null;
 
-const usd = (n, dec=2) => (n==null||isNaN(n)) ? '–' : n.toLocaleString('it-IT',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + ' $';
-const signedUsd = (n, dec=2) => (n==null||isNaN(n)) ? '–' : (n>=0?'+':'−') + Math.abs(n).toLocaleString('it-IT',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + ' $';
+const usd = (n, dec=2) => (n==null||isNaN(n)) ? '–' : n.toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + ' $';
+const signedUsd = (n, dec=2) => (n==null||isNaN(n)) ? '–' : (n>=0?'+':'-') + Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:dec,maximumFractionDigits:dec}) + ' $';
 const fmtNum = (n) => {
   if (n==null||isNaN(n)) return '–';
   const a = Math.abs(n);
   const d = a===0?2 : a<1?6 : a<100?4 : 2;
-  return n.toLocaleString('it-IT',{maximumFractionDigits:d});
+  return n.toLocaleString('en-US',{maximumFractionDigits:d});
 };
 const shortAddr = (a) => a.slice(0,6) + '...' + a.slice(-4);
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -306,7 +306,7 @@ function toast(msg, isError=false) {
   t._timeout = setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-/* ============ STORAGE ABSTRACTION ============ */
+/* ============ STORAGE ============ */
 const storage = {
   async getAccounts() {
     if (isGuest) {
@@ -353,7 +353,6 @@ const storage = {
   },
 
   async migrateToUser(userId) {
-    // Migra i conti guest su Supabase dopo il login
     const accs = JSON.parse(localStorage.getItem(GUEST_ACC) || '[]');
     if (accs.length === 0) return 0;
     let migrated = 0;
@@ -362,7 +361,7 @@ const storage = {
         const { error } = await supabase.from('tracked_accounts')
           .insert({ user_id: userId, name: a.name, address: a.address });
         if (!error) migrated++;
-      } catch(e) { console.warn('Migrazione fallita per', a.name); }
+      } catch(e) { console.warn('Migration failed for', a.name); }
     }
     localStorage.removeItem(GUEST_ACC);
     return migrated;
@@ -376,14 +375,13 @@ async function initAuth() {
 
   supabase.auth.onAuthStateChange((event, session) => {
     handleSession(session);
-    // Quando l'utente fa login da magic link, se c'era roba guest, offri migrazione
     if (event === 'SIGNED_IN' && session?.user) {
       const guestAccs = JSON.parse(localStorage.getItem(GUEST_ACC) || '[]');
       if (guestAccs.length > 0) {
         setTimeout(async () => {
-          if (confirm(`Hai ${guestAccs.length} conti salvati come ospite. Vuoi importarli nel tuo account?`)) {
+          if (confirm(`You have ${guestAccs.length} account(s) saved as guest. Import them into your account?`)) {
             const n = await storage.migrateToUser(session.user.id);
-            toast(`${n} conti importati nel tuo account`);
+            toast(`${n} account(s) imported`);
             loadAccounts();
           }
         }, 500);
@@ -391,7 +389,6 @@ async function initAuth() {
     }
   });
 
-  // Email form
   document.getElementById('showEmailBtn').addEventListener('click', () => {
     document.getElementById('emailForm').classList.toggle('active');
     setTimeout(() => document.getElementById('emailInput').focus(), 100);
@@ -402,7 +399,6 @@ async function initAuth() {
     if (e.key === 'Enter') sendMagicLink();
   });
 
-  // Guest button
   document.getElementById('guestBtn').addEventListener('click', () => {
     localStorage.setItem(GUEST_KEY, '1');
     isGuest = true;
@@ -410,10 +406,9 @@ async function initAuth() {
     showDashboard();
   });
 
-  // Logout
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     if (isGuest) {
-      if (!confirm('Uscire dalla modalità ospite? I conti salvati localmente NON saranno cancellati.')) return;
+      if (!confirm('Leave guest mode? Your locally saved accounts will NOT be deleted.')) return;
       localStorage.removeItem(GUEST_KEY);
       location.reload();
     } else {
@@ -422,9 +417,8 @@ async function initAuth() {
     }
   });
 
-  // Upgrade button (da guest a email)
   document.getElementById('upgradeBtn').addEventListener('click', async () => {
-    if (!confirm('Vuoi creare un account per salvare i tuoi conti online? Verrai disconnesso dalla modalità ospite.')) return;
+    if (!confirm('Create an account to save your accounts online? You will be logged out from guest mode.')) return;
     localStorage.removeItem(GUEST_KEY);
     location.reload();
   });
@@ -436,12 +430,12 @@ async function sendMagicLink() {
   const btn   = document.getElementById('sendMagicBtn');
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showLoginMessage('Inserisci un indirizzo email valido', 'error');
+    showLoginMessage('Please enter a valid email address', 'error');
     return;
   }
 
   btn.disabled = true;
-  btn.textContent = 'Invio in corso...';
+  btn.textContent = 'Sending...';
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
@@ -449,14 +443,14 @@ async function sendMagicLink() {
   });
 
   btn.disabled = false;
-  btn.textContent = 'Invia link di accesso';
+  btn.textContent = 'Send magic link';
 
   if (error) {
-    showLoginMessage('Errore: ' + error.message, 'error');
+    showLoginMessage('Error: ' + error.message, 'error');
     return;
   }
 
-  showLoginMessage('✉️ Controlla la tua email! Ti abbiamo inviato un link per accedere.', 'success');
+  showLoginMessage('✉️ Check your inbox! We sent you a login link.', 'success');
   document.getElementById('emailInput').value = '';
 }
 
@@ -474,7 +468,6 @@ function handleSession(session) {
     localStorage.removeItem(GUEST_KEY);
     showDashboard();
   } else {
-    // Controlla guest mode
     if (localStorage.getItem(GUEST_KEY) === '1') {
       isGuest = true;
       currentUser = null;
@@ -496,13 +489,12 @@ function showDashboard() {
   document.getElementById('loginView').style.display = 'none';
   document.getElementById('dashboardView').style.display = 'block';
 
-  // Identità utente
   const idEl = document.getElementById('userIdentity');
   if (isGuest) {
-    idEl.innerHTML = '<span class="guest-badge">OSPITE</span>';
+    idEl.innerHTML = '<span class="guest-badge">GUEST</span>';
     document.getElementById('guestBanner').style.display = 'flex';
     document.getElementById('notifCard').classList.add('disabled');
-    document.getElementById('notifDesc').textContent = 'Crea un account per ricevere avvisi email.';
+    document.getElementById('notifDesc').textContent = 'Create an account to receive email alerts.';
   } else {
     idEl.innerHTML = `<span class="email">${esc(currentUser.email || '')}</span>`;
     document.getElementById('guestBanner').style.display = 'none';
@@ -513,7 +505,7 @@ function showDashboard() {
   loadAccounts();
 }
 
-/* ============ NOTIFICHE ============ */
+/* ============ NOTIFICATIONS ============ */
 async function loadNotificationSettings() {
   if (isGuest || !currentUser) return;
 
@@ -563,10 +555,10 @@ function updateNotifCard() {
   const desc = document.getElementById('notifDesc');
   if (notifSettings.enabled) {
     card.classList.add('on');
-    desc.textContent = `Attivo — riceverai una mail quando il rischio supera il ${notifSettings.threshold}%.`;
+    desc.textContent = `Active — you will receive an email when risk exceeds ${notifSettings.threshold}%.`;
   } else {
     card.classList.remove('on');
-    desc.textContent = 'Ricevi una mail quando il rischio supera la soglia.';
+    desc.textContent = "Receive an email when an account's risk exceeds the threshold.";
   }
 }
 
@@ -580,17 +572,17 @@ async function saveNotificationSettings() {
   if (isGuest || !currentUser) return;
   const payload = { user_id: currentUser.id, enabled: notifSettings.enabled, threshold: notifSettings.threshold };
   const { error } = await supabase.from('notification_settings').upsert(payload, { onConflict: 'user_id' });
-  if (error) { toast('Errore salvataggio notifiche: ' + error.message, true); return; }
-  toast('Impostazioni salvate');
+  if (error) { toast('Error saving notifications: ' + error.message, true); return; }
+  toast('Settings saved');
 }
 
-/* ============ CONTI ============ */
+/* ============ ACCOUNTS ============ */
 async function loadAccounts() {
   try {
     accounts = await storage.getAccounts();
     refreshAll();
   } catch(e) {
-    toast('Errore caricamento conti: ' + e.message, true);
+    toast('Error loading accounts: ' + e.message, true);
   }
 }
 
@@ -600,34 +592,33 @@ async function addAccount() {
   const name   = nameEl.value.trim();
   const addr   = addrEl.value.trim();
 
-  if (!name || !addr)                return toast('Inserisci nome e indirizzo', true);
-  if (!/^0x[a-fA-F0-9]{40}$/.test(addr)) return toast('Indirizzo non valido', true);
+  if (!name || !addr)                return toast('Please enter name and address', true);
+  if (!/^0x[a-fA-F0-9]{40}$/.test(addr)) return toast('Invalid address', true);
 
-  // Controllo duplicati locali
   if (accounts.some(a => a.address.toLowerCase() === addr.toLowerCase()))
-    return toast('Indirizzo già presente', true);
+    return toast('Address already added', true);
 
   try {
     const data = await storage.addAccount(name, addr);
     accounts.push(data);
     nameEl.value = ''; addrEl.value = '';
-    toast('Conto aggiunto');
+    toast('Account added');
     refreshAll();
   } catch(e) {
-    if (e.code === '23505') return toast('Indirizzo già presente', true);
-    toast('Errore: ' + e.message, true);
+    if (e.code === '23505') return toast('Address already added', true);
+    toast('Error: ' + e.message, true);
   }
 }
 
 async function removeAccount(id) {
-  if (!confirm('Rimuovere questo conto?')) return;
+  if (!confirm('Remove this account?')) return;
   try {
     await storage.removeAccount(id);
     accounts = accounts.filter(a => a.id !== id);
-    toast('Conto rimosso');
+    toast('Account removed');
     refreshAll();
   } catch(e) {
-    toast('Errore: ' + e.message, true);
+    toast('Error: ' + e.message, true);
   }
 }
 
@@ -683,7 +674,7 @@ async function fetchAccount(account) {
   const perp = perpRes.status === 'fulfilled' ? perpRes.value : null;
   const spot = spotRes.status === 'fulfilled' ? spotRes.value : null;
   const dailyPnl = pnlRes.status === 'fulfilled' ? pnlRes.value : null;
-  if (!perp && !spot) throw new Error('Nessun dato disponibile');
+  if (!perp && !spot) throw new Error('No data available');
 
   const ms = (perp && perp.marginSummary) || {};
   const perpEquity = parseFloat(ms.accountValue || 0);
@@ -745,13 +736,13 @@ async function refreshAll() {
   const grid = document.getElementById('accountsGrid');
   if (!btn || !grid) { refreshing = false; return; }
 
-  btn.disabled = true; btn.textContent = 'Aggiornamento...';
+  btn.disabled = true; btn.textContent = 'Refreshing...';
 
   if (accounts.length === 0) {
-    grid.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:40px;">Nessun conto. Aggiungine uno qui sotto 👇</div>';
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1;padding:40px;">No accounts yet. Add one below 👇</div>';
     ['gNet','gTotal','gAvailable','gPnl','gMargin','gRiskAvg','gRiskMax'].forEach(id => document.getElementById(id).textContent = '–');
     ['gRiskAvgLabel','gRiskMaxLabel'].forEach(id => document.getElementById(id).textContent = '');
-    btn.disabled = false; btn.textContent = 'Aggiorna'; refreshing = false;
+    btn.disabled = false; btn.textContent = 'Refresh'; refreshing = false;
     return;
   }
 
@@ -765,9 +756,9 @@ async function refreshAll() {
   ));
 
   renderResults(results);
-  document.getElementById('lastUpdate').textContent = 'Ultimo: ' + new Date().toLocaleTimeString('it-IT');
+  document.getElementById('lastUpdate').textContent = 'Last: ' + new Date().toLocaleTimeString('en-US');
 
-  btn.disabled = false; btn.textContent = 'Aggiorna';
+  btn.disabled = false; btn.textContent = 'Refresh';
   refreshing = false;
 }
 
@@ -824,7 +815,7 @@ function renderResults(results) {
 
 function riskClass(ratio) { return ratio < 20 ? 'green' : ratio < 50 ? 'yellow' : 'red'; }
 function riskBadgeClass(ratio) { return ratio < 20 ? 'low' : ratio < 50 ? 'medium' : 'high'; }
-function riskLabel(ratio) { return ratio < 20 ? '🟢 Basso' : ratio < 50 ? '🟡 Medio' : '🔴 Alto'; }
+function riskLabel(ratio) { return ratio < 20 ? '🟢 Low' : ratio < 50 ? '🟡 Medium' : '🔴 High'; }
 
 function renderAccountCard(data, grandTotal) {
   const card = document.createElement('div');
@@ -840,7 +831,7 @@ function renderAccountCard(data, grandTotal) {
   const riskPct = Math.min(100, riskRatio);
   const riskCls = riskRatio < 20 ? '' : riskRatio < 50 ? 'medium' : 'high';
 
-  let chartHtml = '<div class="empty">Storico non disponibile</div>';
+  let chartHtml = '<div class="empty">No history available</div>';
   if (dailyPnl && dailyPnl.length > 0) {
     const maxAbs = Math.max(...dailyPnl.map(d => Math.abs(d.pnl)), 1);
     const totalPeriod = dailyPnl.reduce((s, d) => s + d.pnl, 0);
@@ -853,11 +844,11 @@ function renderAccountCard(data, grandTotal) {
     const firstDay = dailyPnl[0].date.slice(5);
     const lastDay = dailyPnl[dailyPnl.length-1].date.slice(5);
     chartHtml = `<div class="pnl-chart">${bars}</div>
-      <div class="pnl-axis"><span>${firstDay}</span><span class="pnl-total ${totalCls}">7gg: ${signedUsd(totalPeriod)}</span><span>${lastDay}</span></div>`;
+      <div class="pnl-axis"><span>${firstDay}</span><span class="pnl-total ${totalCls}">7d: ${signedUsd(totalPeriod)}</span><span>${lastDay}</span></div>`;
   }
 
   const posHtml = positions.length === 0
-    ? '<div class="empty">Nessuna posizione</div>'
+    ? '<div class="empty">No open positions</div>'
     : positions.map(p => {
         const isLong = p.size > 0;
         const pnlClass = p.pnl >= 0 ? 'green' : 'red';
@@ -868,7 +859,7 @@ function renderAccountCard(data, grandTotal) {
           </div>
           <div class="pos-details">
             <span>Size: <b>${fmtNum(Math.abs(p.size))}</b></span>
-            <span>Valore: <b>${usd(Math.abs(p.value))}</b></span>
+            <span>Value: <b>${usd(Math.abs(p.value))}</b></span>
             <span>Entry: <b>${p.entry ? fmtNum(p.entry) : '–'}</b></span>
             <span>Liq: <b>${p.liq ? fmtNum(p.liq) : '–'}</b></span>
             ${p.roe != null ? `<span>ROE: <b class="${p.roe>=0?'green':'red'}">${p.roe>=0?'+':''}${p.roe.toFixed(2)}%</b></span>` : ''}
@@ -877,31 +868,31 @@ function renderAccountCard(data, grandTotal) {
       }).join('');
 
   const spotHtml = spotHoldings.length === 0
-    ? '<div class="empty">Nessun saldo spot</div>'
+    ? '<div class="empty">No spot balance</div>'
     : spotHoldings.map(s => `<div class="position spot">
         <div class="pos-head"><span>${esc(s.coin)}</span><span>${usd(s.value)}</span></div>
-        <div class="pos-details"><span>Q.tà: <b>${fmtNum(s.amount)}</b></span><span>Prezzo: <b>${s.price ? fmtNum(s.price) : '–'}</b></span></div>
+        <div class="pos-details"><span>Amount: <b>${fmtNum(s.amount)}</b></span><span>Price: <b>${s.price ? fmtNum(s.price) : '–'}</b></span></div>
       </div>`).join('');
 
   card.innerHTML = `
     <div class="card-header">
       <div><h3>${esc(account.name)}</h3><div class="addr">${shortAddr(account.address)}</div></div>
-      <button class="remove-btn" title="Rimuovi" data-remove="${account.id}">×</button>
+      <button class="remove-btn" title="Remove" data-remove="${account.id}">×</button>
     </div>
 
     <div>
       <div class="big-label">Net Portfolio</div>
       <div class="big-equity">${usd(netPortfolio)}</div>
-      <div class="muted" style="font-size:.75rem;margin-top:2px;">${sharePct.toFixed(1)}% del totale</div>
+      <div class="muted" style="font-size:.75rem;margin-top:2px;">${sharePct.toFixed(1)}% of total</div>
     </div>
 
     <div>
-      <div class="row"><span class="k">↳ Investito</span><span class="v">${usd(invested)}</span></div>
-      <div class="row"><span class="k">↳ Non investito</span><span class="v">${usd(nonInvestedSpot)}</span></div>
+      <div class="row"><span class="k">↳ Invested</span><span class="v">${usd(invested)}</span></div>
+      <div class="row"><span class="k">↳ Not invested</span><span class="v">${usd(nonInvestedSpot)}</span></div>
       <div class="row" style="margin-top:6px;"><span class="k">Total Balance</span><span class="v">${usd(totalBalance)}</span></div>
       <div class="row"><span class="k">Available</span><span class="v">${usd(available)}</span></div>
       <div class="bar"><div class="used" style="width:${usedPct}%"></div><div class="free" style="width:${freePct}%"></div></div>
-      <div class="hint">Margine usato ${usd(marginUsed)} · Libero ${usd(available)}</div>
+      <div class="hint">Used margin ${usd(marginUsed)} · Free ${usd(available)}</div>
     </div>
 
     <div>
@@ -910,19 +901,19 @@ function renderAccountCard(data, grandTotal) {
         <span class="risk-badge ${riskBadgeClass(riskRatio)}">⚠ ${riskRatio.toFixed(2)}% · ${riskLabel(riskRatio)}</span>
       </div>
       <div class="bar risk"><div class="r ${riskCls}" style="width:${riskPct}%"></div></div>
-      <div class="hint" style="margin-top:6px;">Margine manutenzione ${usd(crossMaintenanceMargin)}</div>
+      <div class="hint" style="margin-top:6px;">Maintenance margin ${usd(crossMaintenanceMargin)}</div>
       <div class="row" style="margin-top:10px;">
-        <span class="k">PnL non realizzato</span>
+        <span class="k">Unrealized PnL</span>
         <span class="v ${unrealizedPnl>=0?'green':'red'}">${signedUsd(unrealizedPnl)}</span>
       </div>
     </div>
 
     <div class="section-divider"></div>
-    <div><div class="sub-title">P&L Giornaliero (7gg)</div>${chartHtml}</div>
+    <div><div class="sub-title">Daily P&L (7d)</div>${chartHtml}</div>
     <div class="section-divider"></div>
-    <div><div class="sub-title">Posizioni Perps (${positions.length})</div>${posHtml}</div>
+    <div><div class="sub-title">Perps Positions (${positions.length})</div>${posHtml}</div>
     <div class="section-divider"></div>
-    <div><div class="sub-title">Saldo Spot (${spotHoldings.length})</div>${spotHtml}</div>
+    <div><div class="sub-title">Spot Balance (${spotHoldings.length})</div>${spotHtml}</div>
   `;
   return card;
 }
@@ -935,7 +926,7 @@ function renderErrorCard(account, err) {
       <div><h3>${esc(account.name)}</h3><div class="addr">${shortAddr(account.address)}</div></div>
       <button class="remove-btn" data-remove="${account.id}">×</button>
     </div>
-    <div class="red" style="font-weight:600;">Dati non disponibili</div>
+    <div class="red" style="font-weight:600;">Data unavailable</div>
     <div class="muted" style="font-size:.8rem;">${esc(err)}</div>`;
   return c;
 }
