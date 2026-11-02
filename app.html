@@ -15,7 +15,6 @@
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:24px;min-height:100vh;}
   .container{max-width:1400px;margin:0 auto;}
 
-  /* LOGIN */
   .login-wrap{min-height:90vh;display:flex;align-items:center;justify-content:center;}
   .login-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:40px;max-width:440px;width:100%;text-align:center;}
   .login-card h1{margin:0 0 8px;font-size:1.6rem;}
@@ -74,7 +73,6 @@
   .toggle{display:flex;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);cursor:pointer;user-select:none;}
   #lastUpdate{font-size:.8rem;color:var(--muted);}
 
-  /* GUEST BANNER */
   .guest-banner{
     background:linear-gradient(145deg,var(--card),rgba(210,153,34,.08));
     border:1px solid rgba(210,153,34,.4);
@@ -88,7 +86,6 @@
     padding:8px 16px;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;
   }
 
-  /* NOTIFICATIONS */
   .notif-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;flex-wrap:wrap;align-items:center;gap:16px;}
   .notif-card.on{border-color:rgba(63,185,80,.4);background:linear-gradient(145deg,var(--card),rgba(63,185,80,.05));}
   .notif-card.disabled{opacity:.5;pointer-events:none;}
@@ -139,6 +136,7 @@
   .position.long{border-left-color:var(--green);}
   .position.short{border-left-color:var(--red);}
   .position.spot{border-left-color:var(--blue);}
+  .position.xyz{border-left-color:var(--purple);}
   .pos-head{display:flex;justify-content:space-between;align-items:center;font-weight:600;}
   .pos-details{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;font-size:.72rem;color:var(--muted);margin-top:6px;font-family:ui-monospace,monospace;}
   .pos-details b{color:var(--text);font-weight:500;}
@@ -168,6 +166,7 @@
   .toast.show{opacity:1;}
   .toast.error{border-color:var(--red);}
   .hint{font-size:.7rem;color:var(--muted);font-style:italic;margin-top:-4px;}
+  .dex-section{background:rgba(163,113,247,.05);border:1px solid rgba(163,113,247,.25);border-radius:8px;padding:12px;}
   @media (max-width:600px){
     body{padding:14px;}
     .stat-box .value{font-size:1.15rem;}
@@ -178,7 +177,6 @@
 </head>
 <body>
 
-<!-- ===================== LOGIN ===================== -->
 <div id="loginView" class="login-wrap" style="display:none;">
   <div class="login-card">
     <h1>WHAMM</h1>
@@ -202,7 +200,6 @@
   </div>
 </div>
 
-<!-- ===================== DASHBOARD ===================== -->
 <div id="dashboardView" class="container" style="display:none;">
   <header>
     <h1><span class="dot"></span>WHAMM</h1>
@@ -667,48 +664,99 @@ async function fetchDailyPnl(address) {
 async function fetchAccount(account) {
   const user = account.address.toLowerCase();
 
-  // 1. Chiamata al DEX principale (invariata)
-  const [perpRes, spotRes, pnlRes] = await Promise.allSettled([
+  const [perpRes, spotRes, pnlRes, xyzRes] = await Promise.allSettled([
     hlPost({ type: 'clearinghouseState', user }),
     hlPost({ type: 'spotClearinghouseState', user }),
-    fetchDailyPnl(user)
+    fetchDailyPnl(user),
+    hlPost({ type: 'clearinghouseState', user, dex: 'xyz' })
   ]);
-
-  // 2. NUOVO: chiamata al DEX "xyz" per i perpetual HIP-3 (SPCX, ecc.)
-  // Il parametro "dex" è la chiave per accedere a quel conto separato.
-  const xyzPerp = await hlPost({ 
-    type: 'clearinghouseState', 
-    user, 
-    dex: 'xyz' 
-  }).catch(() => null); // Se il DEX non esiste o fallisce, non bloccare tutto
 
   const perp = perpRes.status === 'fulfilled' ? perpRes.value : null;
   const spot = spotRes.status === 'fulfilled' ? spotRes.value : null;
   const dailyPnl = pnlRes.status === 'fulfilled' ? pnlRes.value : null;
+  const xyzPerp = xyzRes.status === 'fulfilled' ? xyzRes.value : null;
 
-  if (!perp && !spot && !xyzPerp) throw new Error('Nessun dato disponibile');
+  if (!perp && !spot) throw new Error('No data available');
 
-  // 3. Unisci le posizioni del DEX principale e del DEX xyz
-  const positionsMain = ((perp && perp.assetPositions) || []).map(p => p.position).filter(Boolean);
-  const positionsXyz  = ((xyzPerp && xyzPerp.assetPositions) || []).map(p => p.position).filter(Boolean);
-  const allPositions  = [...positionsMain, ...positionsXyz];
+  // --- Margin dati DEX principale ---
+  const msMain = (perp && perp.marginSummary) || {};
+  const marginUsedMain = parseFloat(msMain.totalMarginUsed || 0);
+  const crossMMMain    = parseFloat((perp && perp.crossMaintenanceMarginUsed) || 0);
+  const perpEquityMain = parseFloat(msMain.accountValue || 0);
 
-  // 4. Calcola il margine di manutenzione TOTALE (somma dei due DEX)
-  // Nota: questo è un valore aggregato, non un "rischio unificato" (vedi sotto)
-  const marginMain = parseFloat((perp && perp.crossMaintenanceMarginUsed) || 0);
-  const marginXyz  = parseFloat((xyzPerp && xyzPerp.crossMaintenanceMarginUsed) || 0);
-  const crossMaintenanceMargin = marginMain + marginXyz;
+  // --- Margin dati DEX xyz (HIP-3) ---
+  const msXyz = (xyzPerp && xyzPerp.marginSummary) || {};
+  const marginUsedXyz = parseFloat(msXyz.totalMarginUsed || 0);
+  const crossMMXyz    = parseFloat((xyzPerp && xyzPerp.crossMaintenanceMarginUsed) || 0);
+  const perpEquityXyz = parseFloat(msXyz.accountValue || 0);
 
-  // ... da qui in poi il resto del codice rimane uguale, ma usa `allPositions`
-  // invece di `perp.assetPositions` per costruire l'array `positions`.
-  // Ad esempio:
-  const positions = allPositions.map(pos => {
-    const size = parseFloat(pos.szi || 0);
-    // ... stessa logica di prima per estrarre entry, value, pnl, ecc.
-    // Il campo `pos.coin` per SPCX sarà probabilmente "SPCX" (non "xyz:SPCX"),
-    // ma i valori numerici sono già corretti.
-  }).filter(p => p.size !== 0);
-  // ... il resto della funzione (calcolo spot, netPortfolio, ecc.) rimane invariato
+  // --- Aggregati ---
+  const marginUsed             = marginUsedMain + marginUsedXyz;
+  const crossMaintenanceMargin = crossMMMain + crossMMXyz;
+  const perpEquity             = perpEquityMain + perpEquityXyz;
+
+  // --- Posizioni (entrambi i DEX) ---
+  const parsePositions = (dexState, dexLabel) =>
+    ((dexState && dexState.assetPositions) || []).map(p => {
+      const pos = p.position || {};
+      const size = parseFloat(pos.szi || 0);
+      return {
+        coin: pos.coin,
+        dex: dexLabel,
+        size,
+        entry: parseFloat(pos.entryPx || 0) || null,
+        value: parseFloat(pos.positionValue || 0),
+        pnl: parseFloat(pos.unrealizedPnl || 0),
+        liq: pos.liquidationPx ? parseFloat(pos.liquidationPx) : null,
+        leverage: pos.leverage ? pos.leverage.value : null,
+        roe: pos.returnOnEquity != null ? parseFloat(pos.returnOnEquity) * 100 : null
+      };
+    }).filter(p => p.size !== 0);
+
+  const positionsMain = parsePositions(perp, 'main');
+  const positionsXyz  = parsePositions(xyzPerp, 'xyz');
+  const positions = [...positionsMain, ...positionsXyz]
+    .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+
+  // --- Spot ---
+  const spotHoldings = [];
+  let spotEquity = 0, usdcSpot = 0;
+  if (spot && Array.isArray(spot.balances)) {
+    spot.balances.forEach(b => {
+      const total = parseFloat(b.total || 0);
+      if (total <= 0) return;
+      const price = spotPrices[b.coin] ?? 0;
+      const value = total * price;
+      spotEquity += value;
+      if (b.coin === 'USDC') usdcSpot = total;
+      spotHoldings.push({ coin: b.coin, amount: total, price, value });
+    });
+  }
+  spotHoldings.sort((a, b) => b.value - a.value);
+
+  const unrealizedPnl    = positions.reduce((s, p) => s + p.pnl, 0);
+  const netPortfolio     = spotEquity + unrealizedPnl;
+  const nonInvestedSpot  = Math.max(0, usdcSpot - marginUsed);
+  const invested         = netPortfolio - nonInvestedSpot;
+  const available        = usdcSpot;
+
+  // --- Rischio aggregato e per DEX ---
+  const riskRatio     = available > 0 ? (crossMaintenanceMargin / available) * 100 : 0;
+  const riskRatioMain = available > 0 ? (crossMMMain / available) * 100 : 0;
+  const riskRatioXyz  = available > 0 ? (crossMMXyz / available) * 100 : 0;
+
+  return {
+    account,
+    perpEquity, marginUsed, crossMaintenanceMargin,
+    positions, spotEquity, spotHoldings,
+    totalBalance: spotEquity,
+    available: nonInvestedSpot,
+    netPortfolio, invested, nonInvestedSpot,
+    unrealizedPnl, riskRatio, dailyPnl,
+    marginUsedMain, crossMMMain, riskRatioMain,
+    marginUsedXyz, crossMMXyz, riskRatioXyz,
+    hasXyz: !!xyzPerp && (positionsXyz.length > 0 || crossMMXyz > 0 || marginUsedXyz > 0)
+  };
 }
 
 async function refreshAll() {
@@ -805,7 +853,9 @@ function renderAccountCard(data, grandTotal) {
   card.className = 'card';
   const { account, marginUsed, crossMaintenanceMargin, positions, spotHoldings,
           totalBalance, available, netPortfolio, invested, nonInvestedSpot,
-          unrealizedPnl, riskRatio, dailyPnl } = data;
+          unrealizedPnl, riskRatio, dailyPnl,
+          marginUsedMain, crossMMMain, riskRatioMain,
+          marginUsedXyz, crossMMXyz, riskRatioXyz, hasXyz } = data;
 
   const sharePct = grandTotal > 0 ? (netPortfolio / grandTotal) * 100 : 0;
   const totalForBar = marginUsed + available;
@@ -835,9 +885,11 @@ function renderAccountCard(data, grandTotal) {
     : positions.map(p => {
         const isLong = p.size > 0;
         const pnlClass = p.pnl >= 0 ? 'green' : 'red';
-        return `<div class="position ${isLong ? 'long' : 'short'}">
+        const dexTag = p.dex === 'xyz' ? ' <span class="muted" style="font-size:.68rem;padding:1px 5px;background:rgba(163,113,247,.2);border-radius:3px;color:var(--purple);">xyz</span>' : '';
+        const posClass = p.dex === 'xyz' ? 'position xyz' : `position ${isLong ? 'long' : 'short'}`;
+        return `<div class="${posClass}">
           <div class="pos-head">
-            <span>${esc(p.coin)} <span class="muted" style="font-weight:400;font-size:.72rem;">${isLong?'LONG':'SHORT'}${p.leverage?' · '+p.leverage+'x':''}</span></span>
+            <span>${esc(p.coin)}${dexTag} <span class="muted" style="font-weight:400;font-size:.72rem;">${isLong?'LONG':'SHORT'}${p.leverage?' · '+p.leverage+'x':''}</span></span>
             <span class="${pnlClass}">${signedUsd(p.pnl)}</span>
           </div>
           <div class="pos-details">
@@ -856,6 +908,26 @@ function renderAccountCard(data, grandTotal) {
         <div class="pos-head"><span>${esc(s.coin)}</span><span>${usd(s.value)}</span></div>
         <div class="pos-details"><span>Amount: <b>${fmtNum(s.amount)}</b></span><span>Price: <b>${s.price ? fmtNum(s.price) : '–'}</b></span></div>
       </div>`).join('');
+
+  const xyzHtml = hasXyz ? `
+    <div class="section-divider"></div>
+    <div class="dex-section">
+      <div class="sub-title" style="color:var(--purple);">XYZ DEX (HIP-3) — Separate Margin</div>
+      <div class="row">
+        <span class="k">Maintenance margin (xyz)</span>
+        <span class="v">${usd(crossMMXyz)}</span>
+      </div>
+      <div class="row">
+        <span class="k">Used margin (xyz)</span>
+        <span class="v">${usd(marginUsedXyz)}</span>
+      </div>
+      <div class="row" style="margin-top:6px;">
+        <span class="k">Risk ratio (xyz)</span>
+        <span class="risk-badge ${riskBadgeClass(riskRatioXyz)}">⚠ ${riskRatioXyz.toFixed(2)}% · ${riskLabel(riskRatioXyz)}</span>
+      </div>
+      <div class="hint" style="margin-top:8px;">This DEX uses a separate margin account. Risk here is independent from the main DEX and should be monitored separately.</div>
+    </div>
+  ` : '';
 
   card.innerHTML = `
     <div class="card-header">
@@ -884,12 +956,14 @@ function renderAccountCard(data, grandTotal) {
         <span class="risk-badge ${riskBadgeClass(riskRatio)}">⚠ ${riskRatio.toFixed(2)}% · ${riskLabel(riskRatio)}</span>
       </div>
       <div class="bar risk"><div class="r ${riskCls}" style="width:${riskPct}%"></div></div>
-      <div class="hint" style="margin-top:6px;">Maintenance margin ${usd(crossMaintenanceMargin)}</div>
+      <div class="hint" style="margin-top:6px;">Maintenance margin ${usd(crossMaintenanceMargin)}${hasXyz ? ' (main ' + usd(crossMMMain) + ' + xyz ' + usd(crossMMXyz) + ')' : ''}</div>
       <div class="row" style="margin-top:10px;">
         <span class="k">Unrealized PnL</span>
         <span class="v ${unrealizedPnl>=0?'green':'red'}">${signedUsd(unrealizedPnl)}</span>
       </div>
     </div>
+
+    ${xyzHtml}
 
     <div class="section-divider"></div>
     <div><div class="sub-title">Daily P&L (7d)</div>${chartHtml}</div>
